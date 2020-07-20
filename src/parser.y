@@ -19,28 +19,47 @@
 %token <ival> INT
 %token <fval> FLOAT
 %token <sval> STRING
+%token <sval> IDENTIFIER
+
+%token EQUAL
+       NOT_EQUAL
+       MORE_EQUAL
+       LESS_EQUAL
+       MORE
+       LESS
+       SUBST
+       PLUS
+       MINUS
+       ASTERISK
+       SLASH
+       AND
+       OR
+       ADD_SUBST
+       SUBT_SUBST
+       MULT_SUBST
+       DIV_SUBST
+       RETURN
+       DOT
+       COMMA
+       INPUT
+       OUTPUT
+       IF
+       ELSE
+       FOR
+       WHILE
+       BREAK
+       CONTINUE
+       FUNC
+       LEFT_PAREN
+       RIGHT_PAREN
+       IDENT_DECL
+       EOL
 
 %%
 snazzle:
-  INT snazzle      {
-      cout << "bison found an int: " << $1 << endl;
-    }
-  | FLOAT snazzle  {
-      cout << "bison found a float: " << $1 << endl;
-    }
-  | STRING snazzle {
-      cout << "bison found a string: " << $1 << endl; free($1);
-    }
-  | INT            {
-      cout << "bison found an int: " << $1 << endl;
-    }
-  | FLOAT          {
-      cout << "bison found a float: " << $1 << endl;
-    }
-  | STRING         {
-      cout << "bison found a string: " << $1 << endl; free($1);
-    }
-  ;
+  STRING STRING {
+    cout << "correct" << endl;
+  };
 %%
 
 int main(int, char**) {

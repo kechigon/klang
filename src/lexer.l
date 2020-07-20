@@ -1,13 +1,14 @@
 %{
   #include <cstdio>
   #include <iostream>
- // #include "parser.tab.h"
+  #include <cstdlib>
+  #include "parser.tab.h"
   using namespace std;
 %}
 %option noyywrap
 WHITESPACE      [ \t]
-INTEGER         [-\+]*[0-9]+
-FLOATING        {INTEGER}\.[0-9]+
+INT             [-\+]*[0-9]+
+FLOAT           {INT}\.[0-9]+
 STRING          \"[^"]*\"|\'[^']*\'
 COMMENT         <.*\n|<([^<]|\n)*>
 IDENTIFIER      [a-zA-Z_][0-9a-zA-Z_]*
@@ -46,11 +47,11 @@ RIGHT_PAREN     \)
 IDENT_DECL      \$
 EOL             \n|\r\n
 %%
-{EOL}               { cout << "Found a EOL: " << yytext << endl; }
+{EOL}               { cout << "Found a EOL " << endl; }
 {WHITESPACE}        ;
-{INTEGER}           { cout << "Found a INTEGER:" << yytext << endl; }
-{FLOATING}          { cout << "Found a FLOATING:: " << yytext << endl; }
-{STRING}            { cout << "Found a string: " << yytext << endl; }
+{INT}               { yylval.ival = atoi(yytext); return INT; }
+{FLOAT}             { yylval.fval =atof(yytext); return FLOAT; }
+{STRING}            { yylval.sval = strdup(yytext); return STRING; }
 {EQUAL}             { cout << "Found a EQUAL: " << yytext << endl; }
 {NOT_EQUAL}         { cout << "Found a NOT_EQUAL: " << yytext << endl; }
 {MORE_EQUAL}        { cout << "Found a MORE_EQUAL: " << yytext << endl; }
@@ -82,22 +83,7 @@ EOL             \n|\r\n
 {FUNC}              { cout << "Found a func: " << yytext << endl; }
 {LEFT_PAREN}        { cout << "Found a (: " << yytext << endl; }
 {RIGHT_PAREN}       { cout << "Found a ): " << yytext << endl; }
-{COMMENT}           { cout << "Found a COMMENT: " << yytext << endl; }
+{COMMENT}           ;
 {IDENTIFIER}        { cout << "Found a IDENTIFIER: " << yytext << endl; }
 {IDENT_DECL}        { cout << "Found a $: " << yytext << endl; }
 %%
-int main(int, char**) {
-  
-  // open a file handle to a particular file:
-  FILE *myfile = fopen("a.file", "r");
-  // make sure it's valid:
-  if (!myfile) {
-    cout << "I can't open a.file!" << endl;
-    return -1;
-  }
-  // set lex to read from it instead of defaulting to STDIN:
-  yyin = myfile;
-  
-  // lex through the input:
-  while(yylex());
-}
