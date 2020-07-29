@@ -7,6 +7,7 @@
   extern int yyparse();
   extern FILE *yyin;
   extern int line_num;
+  int block_num = 0;
  
   void yyerror(const char *s);
 %}
@@ -55,11 +56,49 @@
        RIGHT_PAREN
        IDENT_DECL
        EOL
+%token END 0 
 
 %%
-snazzle:
-  STRING STRING {
-    cout << "correct" << endl;
+program:
+  blocks {
+    cout << "end of program" << endl;
+  };
+
+blocks:
+  block {
+    cout << "end of blocks" << endl;
+  }
+  |
+  blocks block {
+    cout << "end of blocks" << endl;
+  };
+
+block:
+  lines {
+    cout << "end of block" << endl;
+  };
+
+lines:
+  line {
+    cout << "end of lines" << endl;
+  }
+  |
+  lines line {
+    cout << "end of lines" << endl;
+  };
+
+line:
+  declaration EOL {
+    cout << "end of line" << endl;      /*expressionなども*/
+  }
+  |
+  declaration END {
+    cout << "end of line" << endl;
+  };
+
+declaration:
+  IDENT_DECL IDENTIFIER {
+    cout << "end of declaration" << endl;
   };
 %%
 

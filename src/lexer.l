@@ -206,4 +206,8 @@ EOL             \n|\r\n
 {IDENT_DECL} {
   return IDENT_DECL;
 }
+
+<<EOF>> {
+  return 0;
+}
 %%
