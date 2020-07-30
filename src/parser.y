@@ -65,11 +65,11 @@ program:
   };
 
 blocks:
-  block {
+  blocks block {
     cout << "end of blocks" << endl;
   }
   |
-  blocks block {
+  block {
     cout << "end of blocks" << endl;
   };
 
@@ -79,26 +79,44 @@ block:
   };
 
 lines:
-  line {
+  lines line {
     cout << "end of lines" << endl;
   }
   |
-  lines line {
+  line {
     cout << "end of lines" << endl;
   };
 
 line:
-  declaration EOL {
+  line_content EOL {
     cout << "end of line" << endl;      /*expressionなども*/
   }
   |
-  declaration END {
+  line_content END {
     cout << "end of line" << endl;
+  };
+
+line_content:
+  declaration {
+    cout << "end of line_content" << endl;
+  }
+  |
+  input_output {
+    cout << "end of line_content" << endl;
   };
 
 declaration:
   IDENT_DECL IDENTIFIER {
     cout << "end of declaration" << endl;
+  };
+
+input_output:
+  INPUT IDENTIFIER {
+    cout << "end of input_output" << endl;
+  }
+  |
+  OUTPUT IDENTIFIER {
+    cout << "end of input_output" << endl;
   };
 %%
 
