@@ -1,10 +1,10 @@
 %{
   #include <cstdio>
-  #include <iostream>
   #include <cstdlib>
+  #include <string.h>
   #include "parser.tab.h"
-  int line_num = 1;
   using namespace std;
+  int line_num = 1;
 %}
 %option noyywrap
 WHITESPACE      [ \t]
@@ -23,19 +23,21 @@ LESS            <
 SUBST           =
 PLUS            \+
 MINUS           -
-ASTERISK        \*
-SLASH           \/
+MULT            \*
+DIV             \/
+MOD             %
 AND             &
 OR              \|
 ADD_SUBST       \+=
 SUBT_SUBST      -=
 MULT_SUBST      \*=
 DIV_SUBST       \/=
+MOD_SUBST       %=
 RETURN          return
 DOT             \.
 COMMA           ,
-INPUT           %
-OUTPUT          #
+INPUT           #
+OUTPUT          !
 IF              if
 ELSE            else
 FOR             for
@@ -56,13 +58,13 @@ EOL             \n|\r\n
 
 {WHITESPACE} ;
 
-{INT} { 
-  yylval.ival = atoi(yytext); 
+{INT} {
+  yylval.lval = atol(yytext); 
   return INT; 
 }
 
 {FLOAT} {
-  yylval.fval =atof(yytext); 
+  yylval.dval = atof(yytext); 
   return FLOAT; 
 }
 
@@ -107,13 +109,18 @@ EOL             \n|\r\n
   return MINUS;
 }
 
-{ASTERISK} {
-  return ASTERISK;
+{MULT} {
+  return MULT;
 }
 
-{SLASH} {
-  return SLASH;
+{DIV} {
+  return DIV;
 }
+
+{MOD} {
+  return MOD;
+}
+
 {AND} {
   return AND;
 }
@@ -136,6 +143,10 @@ EOL             \n|\r\n
 
 {DIV_SUBST} {
   return DIV_SUBST;
+}
+
+{MOD_SUBST} {
+  return MOD_SUBST;
 }
 
 {RETURN} {

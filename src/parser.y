@@ -13,13 +13,13 @@
 %}
 
 %union {
-  int ival;
-  float fval;
-  char *sval;
+  long lval;
+  double dval;
+  char* sval;
 }
 
-%token <ival> INT
-%token <fval> FLOAT
+%token <lval> INT
+%token <dval> FLOAT
 %token <sval> STRING
 %token <sval> IDENTIFIER
 
@@ -32,14 +32,16 @@
        SUBST
        PLUS
        MINUS
-       ASTERISK
-       SLASH
+       MULT
+       DIV
        AND
+       MOD
        OR
        ADD_SUBST
        SUBT_SUBST
        MULT_SUBST
        DIV_SUBST
+       MOD_SUBST
        RETURN
        DOT
        COMMA
@@ -57,6 +59,13 @@
        IDENT_DECL
        EOL
 %token END 0 
+/*%typeは$$ = としたときに指定する*/
+%right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST MOD_SUBST
+%left AND OR
+%left EQUAL NOT_EQUAL MORE_EQUAL LESS_EQUAL MORE LESS
+%left PLUS MINUS
+%left MULT DIV MOD
+%left UMINUS
 
 %%
 program:
@@ -66,11 +75,15 @@ program:
 
 blocks:
   blocks block {
-    cout << "end of blocks" << endl;
+    cout << "end of blocks repeat" << endl;
   }
   |
   block {
-    cout << "end of blocks" << endl;
+    cout << "end of blocks one time" << endl;
+  }
+  |
+  eols block {
+    cout << "end of blocks eols" << endl;
   };
 
 block:
@@ -80,44 +93,173 @@ block:
 
 lines:
   lines line {
-    cout << "end of lines" << endl;
+    cout << "end of lines repeat" << endl;
   }
   |
   line {
-    cout << "end of lines" << endl;
+    cout << "end of lines one time" << endl;
   };
 
 line:
-  line_content EOL {
-    cout << "end of line" << endl;      /*expressionなども*/
+  line_content eols {
+    cout << "end of line eols" << endl;
   }
   |
   line_content END {
-    cout << "end of line" << endl;
+    cout << "end of line END" << endl;
   };
 
 line_content:
   declaration {
-    cout << "end of line_content" << endl;
+    cout << "end of line_content declaretion" << endl;
   }
   |
   input_output {
-    cout << "end of line_content" << endl;
+    cout << "end of line_content input_output" << endl;
+  }
+  |
+  substcalc {
+    cout << "end of line_content substcalc" << endl;
   };
 
 declaration:
-  IDENT_DECL IDENTIFIER {
+  IDENT_DECL identifiers {
     cout << "end of declaration" << endl;
   };
 
 input_output:
-  INPUT IDENTIFIER {
-    cout << "end of input_output" << endl;
+  INPUT identifiers {
+    cout << "end of input_output input" << endl;
   }
   |
-  OUTPUT IDENTIFIER {
-    cout << "end of input_output" << endl;
+  OUTPUT identifiers {
+    cout << "end of input_output output" << endl;
   };
+
+identifiers:
+  identifiers COMMA IDENTIFIER {
+    cout << "end of identifiers mult" << endl;
+  }
+  |
+  identifiers COMMA IDENTIFIER DOT INT {
+    cout << "end of identifiers mult array" << endl;
+  }
+  |
+  IDENTIFIER {
+    cout << "end of identifiers one" << endl;
+  }
+  |
+  IDENTIFIER DOT INT {
+    cout << "end of identifiers one array" << endl;
+  };
+
+substcalc:
+  identifiers SUBST expression {
+    cout << "end of sbstcalc SUBST" << endl;
+  }
+  |
+  identifiers ADD_SUBST expression {
+    cout << "end of substcalc ADD_SUBST" << endl;
+  }
+  |
+  identifiers SUBT_SUBST expression {
+    cout << "end of substcalc SUBT_SUBST" << endl;
+  }
+  |
+  identifiers MULT_SUBST expression {
+    cout << "end of substcalc MULT_SUBST" << endl;
+  }
+  |
+  identifiers DIV_SUBST expression {
+    cout << "end of substcalc DIV_SUBST" << endl;
+  }
+  |
+  identifiers MOD_SUBST expression {
+    cout << "end of substcalc MOD_SUBST" << endl;
+  };
+
+expression:
+  expression PLUS expression {
+    cout << "end of expression PULS" << endl;
+  }
+  |
+  expression MINUS expression {
+    cout << "end of expression MINUS" << endl;
+  }
+  |
+  expression MULT expression {
+    cout << "end of expression MULT" << endl;
+  }
+  |
+  expression DIV expression {
+    cout << "end of expression DIV" << endl;
+  }
+  |
+  expression MOD expression {
+    cout << "end of expression MOD" << endl;
+  }
+  |
+  expression EQUAL expression {
+    cout << "end of expression EQUAL" << endl;
+  }
+  |
+  expression NOT_EQUAL expression {
+    cout << "end of expression NOT_EQUAL" << endl;
+  }
+  |
+  expression MORE_EQUAL expression {
+    cout << "end of expression MORE_EQUAL" << endl;
+  }
+  |
+  expression LESS_EQUAL expression {
+    cout << "end of expression LESS_EQUAL" << endl;
+  }
+  |
+  expression MORE expression {
+    cout << "end of expression MORE" << endl;
+  }
+  |
+  expression LESS expression {
+    cout << "end of expression LESS" << endl;
+  }
+  |
+  expression AND expression {
+    cout << "end of expression AND" << endl;
+  }
+  |
+  expression OR expression {
+    cout << "end of expression OR" << endl;
+  }
+  |
+  monomial {
+    cout << "end of expression monomial" << endl;
+  }
+  |
+  MINUS expression %prec UMINUS {
+    cout << "end of expression UMINUS" << endl;
+  }
+  |
+  LEFT_PAREN expression RIGHT_PAREN {
+    cout << "end of expression PAREN" << endl;
+  };
+
+monomial:
+  INT {
+    cout << "end of monomial " << $1 << endl;
+  }
+  |
+  FLOAT {
+    cout << "end of monomial " << $1 << endl;
+  }
+  |
+  IDENTIFIER {
+    cout << "end of monomial " << $1 << endl;
+  };
+
+eols:
+  eols EOL
+  |
+  EOL;
 %%
 
 int main(int, char**) {
@@ -135,7 +277,7 @@ int main(int, char**) {
 }
 
 void yyerror(const char *s) {
-  cout << "parse error on line" << line_num << "! Message: " << s << endl;
+  cout << "parse error on line " << line_num << " ! Message: " << s << endl;
 
   exit(-1);
 }
