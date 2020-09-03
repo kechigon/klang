@@ -48,7 +48,7 @@ LEFT_PAREN      \(
 RIGHT_PAREN     \)
 LEFT_BRACE      \{
 RIGHT_BRACE     \}
-RIGHT_BRACKET     \]
+RIGHT_BRACKET   \]
 IDENT_DECL      \$
 EOL             \n|\r\n
 

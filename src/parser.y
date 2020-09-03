@@ -123,8 +123,28 @@ element_content:
     cout << "element_content subst_calc" << endl;
   }
   |
+  subst_calc_2 {
+    cout << "element_content subst_calc_2" << endl;
+  }
+  |
   if_stmt {
     cout << "element_content if_stmt" << endl;
+  }
+  |
+  WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "element_content while_stmt" << endl;
+  }
+  |
+  for_stmt {
+    cout << "element_content for_stmt" << endl;
+  }
+  |
+  BREAK {
+    cout << "element_content BREAK" << endl;
+  }
+  |
+  CONTINUE {
+    cout << "element_content CONTINUE" << endl;
   };
 
 declaration:
@@ -132,8 +152,13 @@ declaration:
     cout << "declaration IDENTIFIER" << endl;
   }
   |
+  declaration_subst_calc {
+    cout << "declaration declaration_subst_calc" << endl;
+  };
+
+declaration_subst_calc:
   IDENT_DECL subst_calc {
-    cout << "declaration subst_calc" << endl;
+    cout << "declaration_subst_calc" << endl;
   };
 
 input_output:
@@ -184,28 +209,29 @@ subst_calc:
     cout << "sbstcalc SUBST" << endl;
   }
   |
+  identifiers SUBST STRING {
+    cout << "subst_calc SUBST STRING" << endl;
+  };
+
+subst_calc_2:
   identifiers ADD_SUBST expression {
-    cout << "subst_calc ADD_SUBST" << endl;
+    cout << "subst_calc_2 ADD_SUBST" << endl;
   }
   |
   identifiers SUBT_SUBST expression {
-    cout << "subst_calc SUBT_SUBST" << endl;
+    cout << "subst_calc_2 SUBT_SUBST" << endl;
   }
   |
   identifiers MULT_SUBST expression {
-    cout << "subst_calc MULT_SUBST" << endl;
+    cout << "subst_calc_2 MULT_SUBST" << endl;
   }
   |
   identifiers DIV_SUBST expression {
-    cout << "subst_calc DIV_SUBST" << endl;
+    cout << "subst_calc_2 DIV_SUBST" << endl;
   }
   |
   identifiers MOD_SUBST expression {
-    cout << "subst_calc MOD_SUBST" << endl;
-  }
-  |
-  identifiers SUBST STRING {
-    cout << "subst_calc SUBST STRING" << endl;
+    cout << "subst_calc_2 MOD_SUBST" << endl;
   };
 
 expression:
@@ -319,6 +345,31 @@ else_if_stmts:
   else_if_stmt:
   ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements {
     cout << "else_if_stmt" << endl;
+  };
+
+for_stmt:
+  FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt declaration_subst_calc subst_calc" << endl;
+  }
+  |$
+  FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt declaration_subst_calc subst_calc_2" << endl;
+  }
+  |
+  FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt subst_calc subst_calc" << endl;
+  }
+  |
+  FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt subst_calc subst_calc_2" << endl;
+  }
+  |
+  FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt subst_calc_2 subst_calc" << endl;
+  }
+  |
+  FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
+    cout << "for_stmt subst_calc_2 subst_calc_2" << endl;
   };
 
 eols:

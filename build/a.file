@@ -1,36 +1,23 @@
-if (1)
+for($a = 0 , a * 100 < 4000.0, a += 1)
 {
-  if (4)
-  {
-    @"hoge"
-  ]
-  @"a"
-}
-else if (2)
-{
-  @"b"
   if (1)
   {
-    @"piyo"
-  }
-  else if (1)
-  {
-    @"fuga"
+    while (1)
+    {
+      @a
+    }
+    while(1)
+    {
+      @"hoge"
+    }
   ]
 }
-else if (3)
+$b = 2
+for(b = "aha", b < 8, b = "aha")
 {
-  @""
-  if (1)
+  @"hage"
+  for($i = 0, i < j, i += 1)
   {
-    @"fuga"
+    @"pika"
   }
-  else if (1)
-  {
-    @"fugafuga"
-  }
-  else
-  {
-    @"fugafugafiga"
-  ]
-]
+}
