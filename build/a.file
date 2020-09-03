@@ -1,5 +1,36 @@
-$ d, f
-//fdasfsa
-d = (-(6 * 4 / 3.5+ 2 - 1.2534)% 2 == d *2 + 3% 3 | 432342 - 5 != 5)
-//fasdf
-
+if (1)
+{
+  if (4)
+  {
+    @"hoge"
+  ]
+  @"a"
+}
+else if (2)
+{
+  @"b"
+  if (1)
+  {
+    @"piyo"
+  }
+  else if (1)
+  {
+    @"fuga"
+  ]
+}
+else if (3)
+{
+  @""
+  if (1)
+  {
+    @"fuga"
+  }
+  else if (1)
+  {
+    @"fugafuga"
+  }
+  else
+  {
+    @"fugafugafiga"
+  ]
+]

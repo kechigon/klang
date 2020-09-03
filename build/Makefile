@@ -1,5 +1,5 @@
 klang: lex.yy.c parser.tab.c parser.tab.h
-	g++ parser.tab.c lex.yy.c -lfl -o parser
+	g++ parser.tab.c lex.yy.c -lfl -o klang
 
 parser.tab.c parser.tab.h: ../src/parser.y
 	bison -d -v ../src/parser.y

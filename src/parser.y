@@ -6,8 +6,6 @@
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
-  extern int line_num;
-  int block_num = 0;
  
   void yyerror(const char *s);
 %}
@@ -56,6 +54,9 @@
        FUNC
        LEFT_PAREN
        RIGHT_PAREN
+       LEFT_BRACE
+       RIGHT_BRACE
+       RIGHT_BRACKET
        IDENT_DECL
        EOL
 %token END 0 
@@ -70,190 +71,254 @@
 %%
 program:
   blocks {
-    cout << "end of program" << endl;
+    cout << "program" << endl;
   };
 
 blocks:
   blocks block {
-    cout << "end of blocks repeat" << endl;
+    cout << "blocks repeat" << endl;
   }
   |
   block {
-    cout << "end of blocks one time" << endl;
+    cout << "blocks" << endl;
   }
   |
   eols block {
-    cout << "end of blocks eols" << endl;
+    cout << "blocks eols" << endl;
   };
 
 block:
-  lines {
-    cout << "end of block" << endl;
+  elements {
+    cout << "block elements" << endl;
   };
 
-lines:
-  lines line {
-    cout << "end of lines repeat" << endl;
+elements:
+  elements element {
+    cout << "elements repeat" << endl;
   }
   |
-  line {
-    cout << "end of lines one time" << endl;
+  element {
+    cout << "elements" << endl;
   };
 
-line:
-  line_content eols {
-    cout << "end of line eols" << endl;
+element:
+  element_content eols {
+    cout << "element eols" << endl;
   }
   |
-  line_content END {
-    cout << "end of line END" << endl;
+  element_content END {
+    cout << "element END" << endl;
   };
 
-line_content:
+element_content:
   declaration {
-    cout << "end of line_content declaretion" << endl;
+    cout << "element_content declaretion" << endl;
   }
   |
   input_output {
-    cout << "end of line_content input_output" << endl;
+    cout << "element_content input_output" << endl;
   }
   |
-  substcalc {
-    cout << "end of line_content substcalc" << endl;
+  subst_calc {
+    cout << "element_content subst_calc" << endl;
+  }
+  |
+  if_stmt {
+    cout << "element_content if_stmt" << endl;
   };
 
 declaration:
   IDENT_DECL identifiers {
-    cout << "end of declaration" << endl;
+    cout << "declaration IDENTIFIER" << endl;
+  }
+  |
+  IDENT_DECL subst_calc {
+    cout << "declaration subst_calc" << endl;
   };
 
 input_output:
   INPUT identifiers {
-    cout << "end of input_output input" << endl;
+    cout << "input_output input" << endl;
   }
   |
-  OUTPUT identifiers {
-    cout << "end of input_output output" << endl;
+  outputs {
+    cout << "input_output outputs" << endl;
+  };
+
+outputs:
+  outputs OUTPUT expression {
+    cout << "outputs expression mult" << endl;
+  }
+  |
+  outputs OUTPUT STRING {
+    cout << "outputs STRING mult" << endl;
+  }
+  |
+  OUTPUT expression {
+    cout << "outputs expression" << endl;
+  }
+  |
+  OUTPUT STRING {
+    cout << "outputs STRING" << endl;
   };
 
 identifiers:
   identifiers COMMA IDENTIFIER {
-    cout << "end of identifiers mult" << endl;
+    cout << "identifiers mult " << $3 << endl;
   }
   |
   identifiers COMMA IDENTIFIER DOT INT {
-    cout << "end of identifiers mult array" << endl;
+    cout << "identifiers mult array " << $3 << " " << $5 << endl;
   }
   |
   IDENTIFIER {
-    cout << "end of identifiers one" << endl;
+    cout << "identifiers one " << $1 << endl;
   }
   |
   IDENTIFIER DOT INT {
-    cout << "end of identifiers one array" << endl;
+    cout << "identifiers one array " << $1 << " " << $3 << endl;
   };
 
-substcalc:
+subst_calc:
   identifiers SUBST expression {
-    cout << "end of sbstcalc SUBST" << endl;
+    cout << "sbstcalc SUBST" << endl;
   }
   |
   identifiers ADD_SUBST expression {
-    cout << "end of substcalc ADD_SUBST" << endl;
+    cout << "subst_calc ADD_SUBST" << endl;
   }
   |
   identifiers SUBT_SUBST expression {
-    cout << "end of substcalc SUBT_SUBST" << endl;
+    cout << "subst_calc SUBT_SUBST" << endl;
   }
   |
   identifiers MULT_SUBST expression {
-    cout << "end of substcalc MULT_SUBST" << endl;
+    cout << "subst_calc MULT_SUBST" << endl;
   }
   |
   identifiers DIV_SUBST expression {
-    cout << "end of substcalc DIV_SUBST" << endl;
+    cout << "subst_calc DIV_SUBST" << endl;
   }
   |
   identifiers MOD_SUBST expression {
-    cout << "end of substcalc MOD_SUBST" << endl;
+    cout << "subst_calc MOD_SUBST" << endl;
+  }
+  |
+  identifiers SUBST STRING {
+    cout << "subst_calc SUBST STRING" << endl;
   };
 
 expression:
   expression PLUS expression {
-    cout << "end of expression PULS" << endl;
+    cout << "expression PULS" << endl;
   }
   |
   expression MINUS expression {
-    cout << "end of expression MINUS" << endl;
+    cout << "expression MINUS" << endl;
   }
   |
   expression MULT expression {
-    cout << "end of expression MULT" << endl;
+    cout << "expression MULT" << endl;
   }
   |
   expression DIV expression {
-    cout << "end of expression DIV" << endl;
+    cout << "expression DIV" << endl;
   }
   |
   expression MOD expression {
-    cout << "end of expression MOD" << endl;
+    cout << "expression MOD" << endl;
   }
   |
   expression EQUAL expression {
-    cout << "end of expression EQUAL" << endl;
+    cout << "expression EQUAL" << endl;
   }
   |
   expression NOT_EQUAL expression {
-    cout << "end of expression NOT_EQUAL" << endl;
+    cout << "expression NOT_EQUAL" << endl;
   }
   |
   expression MORE_EQUAL expression {
-    cout << "end of expression MORE_EQUAL" << endl;
+    cout << "expression MORE_EQUAL" << endl;
   }
   |
   expression LESS_EQUAL expression {
-    cout << "end of expression LESS_EQUAL" << endl;
+    cout << "expression LESS_EQUAL" << endl;
   }
   |
   expression MORE expression {
-    cout << "end of expression MORE" << endl;
+    cout << "expression MORE" << endl;
   }
   |
   expression LESS expression {
-    cout << "end of expression LESS" << endl;
+    cout << "expression LESS" << endl;
   }
   |
   expression AND expression {
-    cout << "end of expression AND" << endl;
+    cout << "expression AND" << endl;
   }
   |
   expression OR expression {
-    cout << "end of expression OR" << endl;
+    cout << "expression OR" << endl;
   }
   |
   monomial {
-    cout << "end of expression monomial" << endl;
+    cout << "expression monomial" << endl;
   }
   |
   MINUS expression %prec UMINUS {
-    cout << "end of expression UMINUS" << endl;
+    cout << "expression UMINUS" << endl;
   }
   |
   LEFT_PAREN expression RIGHT_PAREN {
-    cout << "end of expression PAREN" << endl;
+    cout << "expression PAREN" << endl;
   };
 
 monomial:
   INT {
-    cout << "end of monomial " << $1 << endl;
+    cout << "monomial " << $1 << endl;
   }
   |
   FLOAT {
-    cout << "end of monomial " << $1 << endl;
+    cout << "monomial " << $1 << endl;
   }
   |
   IDENTIFIER {
-    cout << "end of monomial " << $1 << endl;
+    cout << "monomial " << $1 << endl;
+  }
+  |
+  IDENTIFIER DOT INT {
+    cout << "monomial " << $1 << " " << $3 << endl;
+  };
+
+if_stmt:
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
+    cout << "if_stmt" << endl;
+  }
+  |
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
+    cout << "if_stmt else" << endl;
+  }
+  |
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET{
+    cout << "if_stmt elseif_stmts_end" << endl;
+  }
+  |
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
+    cout << "if_stmt  else_if_stmts_mid else" << endl;
+  };
+
+else_if_stmts:
+  else_if_stmts RIGHT_BRACE EOL else_if_stmt {
+    cout << "else_if_stmts mult" << endl;
+  }
+  |
+  else_if_stmt {
+    cout << "else_if_stmts" << endl;
+  };
+
+  else_if_stmt:
+  ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements {
+    cout << "else_if_stmt" << endl;
   };
 
 eols:
@@ -277,7 +342,7 @@ int main(int, char**) {
 }
 
 void yyerror(const char *s) {
-  cout << "parse error on line " << line_num << " ! Message: " << s << endl;
+  cout << "parse error on line ! Message: " << s << endl;
 
   exit(-1);
 }

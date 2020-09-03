@@ -4,7 +4,6 @@
   #include <string.h>
   #include "parser.tab.h"
   using namespace std;
-  int line_num = 1;
 %}
 %option noyywrap
 WHITESPACE      [ \t]
@@ -37,7 +36,7 @@ RETURN          return
 DOT             \.
 COMMA           ,
 INPUT           #
-OUTPUT          !
+OUTPUT          @
 IF              if
 ELSE            else
 FOR             for
@@ -47,13 +46,15 @@ CONTINUE        continue
 FUNC            func
 LEFT_PAREN      \(
 RIGHT_PAREN     \)
+LEFT_BRACE      \{
+RIGHT_BRACE     \}
+RIGHT_BRACKET     \]
 IDENT_DECL      \$
 EOL             \n|\r\n
 
 %%
 {EOL} {
   return EOL;
-  line_num++;
 }
 
 {WHITESPACE} ;
@@ -205,13 +206,23 @@ EOL             \n|\r\n
   return RIGHT_PAREN;
 }
 
-{COMMENT} {
-  line_num++;
+{LEFT_BRACE} {
+  return LEFT_BRACE;
 }
+
+{RIGHT_BRACE} {
+  return RIGHT_BRACE;
+}
+
+{COMMENT} ;
 
 {IDENTIFIER} {
   yylval.sval = strdup(yytext); 
   return IDENTIFIER;
+}
+
+{RIGHT_BRACKET} {
+  return RIGHT_BRACKET;
 }
 
 {IDENT_DECL} {
