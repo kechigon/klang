@@ -1,23 +1,26 @@
-for($a = 0 , a * 100 < 4000.0, a += 1)
+
+func fibonacci(n)
 {
-  if (1)
+  if (n < 0)
   {
-    while (1)
-    {
-      @a
-    }
-    while(1)
-    {
-      @"hoge"
-    }
+    return 0
   ]
-}
-$b = 2
-for(b = "aha", b < 8, b = "aha")
-{
-  @"hage"
-  for($i = 0, i < j, i += 1)
+  if (n == 0)
   {
-    @"pika"
-  }
+    return 1
+  ]
+  if (n == 1)
+  {
+    return 1
+  ]
+
+  $a = n - 1;
+  $b = n - 2;
+  return fibonacci(a) + fibonacci(b)
 }
+
+$arg = 2
+if (fibonacci(arg))
+{
+  @1 * 1@2 * 2
+]

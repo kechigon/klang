@@ -76,7 +76,7 @@ program:
 
 blocks:
   blocks block {
-    cout << "blocks repeat" << endl;
+    cout << "blocks mult" << endl;
   }
   |
   block {
@@ -90,6 +90,27 @@ blocks:
 block:
   elements {
     cout << "block elements" << endl;
+  }
+  |
+  func_block {
+    cout << "block func_block" << endl;
+  };
+
+func_block:
+  FUNC IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+    cout << "func_block eols" << endl;
+  }
+  |
+  FUNC IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE END {
+    cout << "func_block END" << endl;
+  }
+  |
+  FUNC IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+    cout << "func_block no identifiers eols" << endl;
+  }
+  |
+  FUNC IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE END {
+    cout << "func_block no identifiers END" << endl;
   };
 
 elements:
@@ -145,6 +166,18 @@ element_content:
   |
   CONTINUE {
     cout << "element_content CONTINUE" << endl;
+  }
+  |
+  RETURN expression {
+    cout << "element_content RETURN expression" << endl;
+  }
+  |
+  RETURN STRING {
+    cout << "element_content RETURN STRING" << endl;
+  }
+  |
+  func_exe {
+    cout << "element_content func_exe" << endl;
   };
 
 declaration:
@@ -314,6 +347,10 @@ monomial:
   |
   IDENTIFIER DOT INT {
     cout << "monomial " << $1 << " " << $3 << endl;
+  }
+  |
+  func_exe {
+    cout << "monomial func_exe" << endl;
   };
 
 if_stmt:
@@ -351,7 +388,7 @@ for_stmt:
   FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     cout << "for_stmt declaration_subst_calc subst_calc" << endl;
   }
-  |$
+  |
   FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     cout << "for_stmt declaration_subst_calc subst_calc_2" << endl;
   }
@@ -370,6 +407,15 @@ for_stmt:
   |
   FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     cout << "for_stmt subst_calc_2 subst_calc_2" << endl;
+  };
+
+func_exe:
+  IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN {
+    cout << "func_exe identifiers" << endl;
+  }
+  |
+  IDENTIFIER LEFT_PAREN RIGHT_PAREN {
+    cout << "func_exe no identifiers" << endl;
   };
 
 eols:
