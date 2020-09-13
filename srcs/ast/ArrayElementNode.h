@@ -1,0 +1,27 @@
+#ifndef ARRAY_ELEMENT_NODE_H
+#define ARRAY_ELEMENT_NODE_H
+
+#include "Node.h"
+#include <string>
+
+class ArrayElementNode : public Node
+{
+public:
+  static ArrayElementNode* Create(const char* _value, int n);
+	static ArrayElementNode* Create(const char* _value1, const char* _value2);
+	virtual std::string getStr1() { return value1; }
+	virtual std::string getStr2() { return value2; }
+  virtual int getint();
+	virtual NodeType getType();
+	virtual int getArrEleType();
+
+protected:
+	ArrayElementNode(const char* _value, int n);
+	ArrayElementNode(const char* _value1, const char* _value2);
+	std::string value1;
+	std::string value2;
+  int num;
+	int type;
+};
+
+#endif

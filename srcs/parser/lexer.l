@@ -2,15 +2,16 @@
   #include <cstdio>
   #include <cstdlib>
   #include <string.h>
+  #include "nodes.h"
   #include "parser.tab.h"
   using namespace std;
 %}
 %option noyywrap
 WHITESPACE      [ \t]
 INT             [-\+]*[0-9]+
-FLOAT           {INT}\.[0-9]+
+DOUBLE           {INT}\.[0-9]+
 STRING          \"[^"]*\"|\'[^']*\'
-COMMENT         \/\/.*\n
+COMMENT         "/*"([^\*]|(\*)*[^\*/])*(\*)*"*/"
 IDENTIFIER      [a-zA-Z_][0-9a-zA-Z_]*
 
 EQUAL           ==
@@ -64,9 +65,9 @@ EOL             \n|\r\n
   return INT; 
 }
 
-{FLOAT} {
+{DOUBLE} {
   yylval.dval = atof(yytext); 
-  return FLOAT; 
+  return DOUBLE; 
 }
 
 {STRING} {
