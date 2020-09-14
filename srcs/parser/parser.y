@@ -6,12 +6,10 @@
   using namespace std;
 
   Node* program;
-  extern int yylex();
-  extern int yyparse();
-  extern void showAST(Node* node);
+  int yylex();
   extern FILE *yyin;
-
   void yyerror(const char *s);
+
 %}
 
 %union {
@@ -549,29 +547,6 @@ eols:
   |
   EOL;
 %%
-
-int main(int, char**) {
-  FILE *myfile = fopen("a.file", "r");
-  
-  if (!myfile) {
-    cout << "I can't open a.file!" << endl;
-    return -1;
-  }
-
-  yyin = myfile;
-
-  printf("\n");
-  cout << "-----syntax check-----" << endl;
-  printf("\n");
-
-  yyparse();
-
-  printf("\n");
-  cout << "-----Show meaning-----" << endl;
-  printf("\n");
-
-  showAST(program);
-}
 
 void yyerror(const char *s) {
   cout << "parse error ! Message: " << s << endl;

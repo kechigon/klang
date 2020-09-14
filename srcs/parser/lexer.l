@@ -1,7 +1,5 @@
 %{
-  #include <cstdio>
   #include <cstdlib>
-  #include <string.h>
   #include "nodes.h"
   #include "parser.tab.h"
   using namespace std;
