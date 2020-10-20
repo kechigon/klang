@@ -20,7 +20,7 @@ void showAST(Node* node){
     now = now->getNext();
   }
   while(!bros.empty()){
-    NodeType nt = bros.front()->getType();
+    nt = bros.front()->getType();
     switch (nt)
     {
       case node_t: showAST(bros.front()->getChild()); break;

@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include "nodes.h"
+#include "CodeGen.h"
 using namespace std;
 
 extern Node* program;
@@ -40,4 +41,10 @@ int main(int argc, char* argv[]){
   printf("\n");
 
   showAST(program);
+
+  printf("\n");
+  CodeGen* codegen = new CodeGen(program);
+	codegen->Make();
+	//delete codegen;
+  fclose(myfile);
 }

@@ -1,8 +1,8 @@
-CFLAG = -I /usr/include/llvm-6.0 -I /usr/include/llvm-c-6.0 -I ../srcs/ast -I ../ast
+CFLAG = -I /usr/include/llvm-6.0 -I /usr/include/llvm-c-6.0 -I ../srcs/ast -I ../ast -I ../srcs/codegen `llvm-config --cxxflags --ldflags --libs`
 NODES = ../srcs/ast/Node.cpp ../srcs/ast/IntNode.cpp ../srcs/ast/StringNode.cpp ../srcs/ast/DoubleNode.cpp ../srcs/ast/ArrayElementNode.cpp
 
-klang: lex.yy.c parser.tab.c parser.tab.h main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o
-	g++ main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o parser.tab.c lex.yy.c ${CFLAG} -lfl -o klang
+klang: lex.yy.c parser.tab.c parser.tab.h main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o
+	g++ main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o parser.tab.c lex.yy.c ${CFLAG} -o klang
 	cp klang ../bin
 
 main.o: ../srcs/main.cpp
@@ -19,6 +19,24 @@ Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o: ${NODES}
 
 showAST.o: ../srcs/ast/showAST.cpp
 	g++ -c ${CFLAG} ../srcs/ast/showAST.cpp
+
+CodeGenContext.o: ../srcs/codegen/CodeGenContext.cpp
+	g++ -c ${CFLAG} ../srcs/codegen/CodeGenContext.cpp
+
+IdMap.o: ../srcs/codegen/IdMap.cpp
+	g++ -c ${CFLAG} ../srcs/codegen/IdMap.cpp
+
+IdTable.o: ../srcs/codegen/IdTable.cpp
+	g++ -c ${CFLAG} ../srcs/codegen/IdTable.cpp
+
+CodeGen.o: ../srcs/codegen/CodeGen.cpp
+	g++ -c ${CFLAG} ../srcs/codegen/CodeGen.cpp
+
+Macro.o: ../srcs/codegen/Macro.cpp
+	g++ -c ${CFLAG} ../srcs/codegen/Macro.cpp
+
+error.o: ../srcs/error.cpp
+	g++ -c ${CFLAG} ../srcs/error.cpp
 
 clean:
 	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o

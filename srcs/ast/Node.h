@@ -43,12 +43,19 @@ public:
 
     bool checknext();
 
+    void check() {check_flag = true;};
+    bool ischecked() {return check_flag;};
+
+    bool isLiteral();
+    void setIsLiteral();
+
 protected:
     void init();
 
     Node* next;
     Node* child;
     bool havenext = false;
+    bool check_flag = false;
 };
 
 #endif

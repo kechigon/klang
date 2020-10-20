@@ -11,11 +11,14 @@ public:
 	static StringNode* Create(std::string _value);
 	virtual std::string getStr() { return value; }
 	virtual NodeType getType();
+	bool isLiteral();
+	void setIsLiteral();
 
 protected:
 	StringNode(const char* _value);
 	StringNode(std::string _value);
 	std::string value;
+	bool Literal = false;
 };
 
 #endif

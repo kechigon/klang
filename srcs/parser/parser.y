@@ -19,9 +19,9 @@
   Node* nodes;
 }
 
-%token <lval> INT
-%token <dval> DOUBLE
-%token <sval> STRING
+%token <lval> INTLITERAL
+%token <dval> DOUBLELITERAL
+%token <sval> STRINGLITERAL
 %token <sval> IDENTIFIER
 
 %token EQUAL
@@ -54,18 +54,21 @@
        WHILE
        BREAK
        CONTINUE
-       FUNC
        LEFT_PAREN
        RIGHT_PAREN
        LEFT_BRACE
        RIGHT_BRACE
        RIGHT_BRACKET
-       IDENT_DECL
+       INT
+       DOUBLE
+       STRING
+       VOID
+       SEMICOLON
        EOL
 %token END 0 
 %type <nodes> program
 %type <nodes> blocks
-%type <nodes> block
+%type <nodes> func_blocks
 %type <nodes> func_block
 %type <nodes> elements
 %type <nodes> element
@@ -84,6 +87,8 @@
 %type <nodes> else_if_stmt
 %type <nodes> for_stmt
 %type <nodes> func_exe
+%type <nodes> args
+%type <nodes> types
 %right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST MOD_SUBST
 %left AND OR
 %left EQUAL NOT_EQUAL MORE_EQUAL LESS_EQUAL MORE LESS
@@ -99,57 +104,62 @@ program:
   };
 
 blocks:
-  blocks block {
-    cout << "blocks mult" << endl;
-    $$ = $1; $$ -> addBrother($2);
-  }
-  |
-  block {
+  elements {
     cout << "blocks" << endl;
     $$ = $1;
   }
   |
-  eols block {
+  eols elements {
     cout << "blocks eols" << endl;
     $$ = $2;
+  }
+  |
+  func_blocks elements {
+    cout << "blocks with func_block" << endl;
+    $$ = $1; $$ -> addBrother($2);
+  }
+  |
+  eols func_blocks elements {
+    cout << "blocks with func_block eols" << endl;
+    $$ = $2; $$ -> addBrother($3);
   };
 
-block:
-  elements {
-    cout << "block elements" << endl;
-    $$ = $1;
+func_blocks:
+  func_blocks func_block {
+    cout << "func_block mult" << endl;
+    $$ = $1; $$ -> addBrother(Node::getList($2));
   }
   |
   func_block {
-    cout << "block func_block" << endl;
+    cout << "func_block one time" << endl;
     $$ = Node::getList($1);
   };
 
 func_block:
-  FUNC IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+  types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
     cout << "func_block eols" << endl;
-    $$ = Node::make_list(4, StringNode::Create("FUNC"), StringNode::Create($2), $4, $9);
+    $$ = Node::make_list(5, StringNode::Create("FUNC"), $1, StringNode::Create($2), $4, $9);
   }
   |
-  FUNC IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE END {
-    cout << "func_block END" << endl;
-    $$ = Node::make_list(3, StringNode::Create("FUNC"), StringNode::Create($2), $4, $9);
+  types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+    cout << "func_block no args eols" << endl;
+    $$ = Node::make_list(4, StringNode::Create("FUNC"), $1, StringNode::Create($2), $8);
   }
   |
-  FUNC IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
-    cout << "func_block no identifiers eols" << endl;
-    $$ = Node::make_list(3, StringNode::Create("FUNC"), StringNode::Create($2), $8);
+  VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+    cout << "void func_block eols" << endl;
+    $$ = Node::make_list(5, StringNode::Create("FUNC"), StringNode::Create("VOID"), StringNode::Create($2), $4, $9);
   }
   |
-  FUNC IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE END {
-    cout << "func_block no identifiers END" << endl;
-    $$ = Node::make_list(3, StringNode::Create("FUNC"), StringNode::Create($2), $8);
+  VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+    cout << "void func_block no args eols" << endl;
+    $$ = Node::make_list(4, StringNode::Create("FUNC"), StringNode::Create("VOID"), StringNode::Create($2), $8);
   };
 
 elements:
   elements element {
     cout << "elements repeat" << endl;
-    $$ = $1; $$ -> addBrother(Node::getList($2));
+    $$ = $1; $$ -> addBrother($2);
   }
   |
   element {
@@ -219,21 +229,27 @@ element_content:
     $$ = Node::make_list(2, StringNode::Create("RETURN"), $2);
   }
   |
-  RETURN STRING {
-    cout << "element_content RETURN STRING" << endl;
+  RETURN STRINGLITERAL {
+    cout << "element_content RETURN STRINGLITERAL" << endl;
     string text = $2;
     $$ = Node::make_list(2, StringNode::Create("RETURN"), StringNode::Create(text.substr(1, text.size()-2)));
+    ((StringNode*)($$->getNext()))->setIsLiteral();
   }
   |
   func_exe {
     cout << "element_content func_exe" << endl;
     $$ = $1;
+  }
+  |
+  SEMICOLON {
+    cout << "element_content SEMICOLON" << endl;
+    $$ = StringNode::Create("NEWLINE");
   };
 
 declaration:
-  IDENT_DECL identifiers {
-    cout << "declaration IDENTIFIER" << endl;
-    $$ = Node::make_list(2, StringNode::Create("IDENT_DECL"), $2);
+  types identifiers {
+    cout << "declaration identifiers" << endl;
+    $$ = Node::make_list(3, StringNode::Create("DECL"), $1, $2);
   }
   |
   declaration_subst_calc {
@@ -242,9 +258,9 @@ declaration:
   };
 
 declaration_subst_calc:
-  IDENT_DECL subst_calc {
+  types subst_calc {
     cout << "declaration_subst_calc" << endl;
-    $$ = Node::make_list(2, StringNode::Create("IDENT_DECL"), $2);
+    $$ = Node::make_list(3, StringNode::Create("DECL_SUBST"), $1, $2);
   };
 
 input_output:
@@ -261,13 +277,18 @@ input_output:
 outputs:
   outputs OUTPUT expression {
     cout << "outputs expression mult" << endl;
-    $$ = $1; $$ -> addBrother(Node::getList($3));
+    $$ = $1; $$ -> addBrother(Node::make_list(2, StringNode::Create("OUTPUT"), $3));
   }
   |
-  outputs OUTPUT STRING {
-    cout << "outputs STRING mult" << endl;
+  outputs OUTPUT STRINGLITERAL {
+    cout << "outputs STRINGLITERAL mult" << endl;
     string text = $3;
-    $$ = $1; $$ -> addBrother(StringNode::Create(text.substr(1, text.size()-2)));
+    $$ = $1; $$ -> addBrother(Node::make_list(2, StringNode::Create("OUTPUT"), StringNode::Create(text.substr(1, text.size()-2))));
+    Node *node = $$;
+    while(node->getNext() != NULL) {
+      node = node->getNext();
+    }
+    ((StringNode*)node)->setIsLiteral();
   }
   |
   OUTPUT expression {
@@ -275,10 +296,11 @@ outputs:
     $$ = Node::make_list(2, StringNode::Create("OUTPUT"), $2);
   }
   |
-  OUTPUT STRING {
-    cout << "outputs STRING" << endl;
+  OUTPUT STRINGLITERAL {
+    cout << "outputs STRINGLITERAL" << endl;
     string text = $2;
     $$ = Node::make_list(2, StringNode::Create("OUTPUT"), StringNode::Create(text.substr(1, text.size()-2)));
+    ((StringNode*)($$->getNext()))->setIsLiteral();
   };
 
 identifiers:
@@ -287,8 +309,8 @@ identifiers:
     $$ = $1; $$ -> addBrother(StringNode::Create($3));
   }
   |
-  identifiers COMMA IDENTIFIER DOT INT {
-    cout << "identifiers mult array INT " << $3 << " " << $5 << endl;
+  identifiers COMMA IDENTIFIER DOT INTLITERAL {
+    cout << "identifiers mult array INT" << $3 << " " << $5 << endl;
     $$ = $1; $$ -> addBrother(ArrayElementNode::Create($3, $5));
   }
   |
@@ -302,13 +324,13 @@ identifiers:
     $$ = StringNode::Create($1);
   }
   |
-  IDENTIFIER DOT INT {
+  IDENTIFIER DOT INTLITERAL {
     cout << "identifiers one array INT " << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
   }
   |
   IDENTIFIER DOT IDENTIFIER {
-    cout << "identifiers one array  IDENTIFIER" << $1 << " " << $3 << endl;
+    cout << "identifiers one array IDENTIFIER" << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
   };
 
@@ -318,10 +340,11 @@ subst_calc:
     $$ = Node::make_list(3, StringNode::Create("SUBST"), $1, $3);
   }
   |
-  identifiers SUBST STRING {
-    cout << "subst_calc SUBST STRING" << endl;
+  identifiers SUBST STRINGLITERAL {
+    cout << "subst_calc SUBST STRINGLITERAL" << endl;
     string text = $3;
     $$ = Node::make_list(3, StringNode::Create("SUBST"), $1, StringNode::Create(text.substr(1, text.size()-2)));
+    ((StringNode*)($$->getNext()->getNext()))->setIsLiteral();
   };
 
 subst_calc_2:
@@ -393,7 +416,7 @@ expression:
   |
   expression LESS_EQUAL expression {
     cout << "expression LESS_EQUAL" << endl;
-    $$ = Node::make_list(3, StringNode::Create("LESS_PULS"), $1, $3);
+    $$ = Node::make_list(3, StringNode::Create("LESS_EQUAL"), $1, $3);
   }
   |
   expression MORE expression {
@@ -432,12 +455,12 @@ expression:
   };
 
 monomial:
-  INT {
+  INTLITERAL {
     cout << "monomial " << $1 << endl;
     $$ = IntNode::Create($1);
   }
   |
-  DOUBLE {
+  DOUBLELITERAL {
     cout << "monomial " << $1 << endl;
     $$ = DoubleNode::Create($1);
   }
@@ -447,7 +470,7 @@ monomial:
     $$ = StringNode::Create($1);
   }
   |
-  IDENTIFIER DOT INT {
+  IDENTIFIER DOT INTLITERAL {
     cout << "monomial " << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
   }
@@ -534,12 +557,39 @@ for_stmt:
 func_exe:
   IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN {
     cout << "func_exe identifiers" << endl;
-    $$ = Node::make_list(3, StringNode::Create("func_exe"), StringNode::Create($1), $3);
+    $$ = Node::make_list(3, StringNode::Create("FUNC_EXE"), StringNode::Create($1), $3);
   }
   |
   IDENTIFIER LEFT_PAREN RIGHT_PAREN {
     cout << "func_exe no identifiers" << endl;
-    $$ = Node::make_list(2, StringNode::Create("func_exe"), StringNode::Create($1));
+    $$ = Node::make_list(2, StringNode::Create("FUNC_EXE"), StringNode::Create($1));
+  };
+
+args:
+  args COMMA types IDENTIFIER {
+    cout << "args mult" << endl;
+    $$ = $1; $$ -> addBrother(Node::make_list(2, $3, StringNode::Create($4)));
+  }
+  |
+  types IDENTIFIER {
+    cout << "args" << endl;
+    $$ = Node::make_list(2, $1, StringNode::Create($2));
+  };
+
+types:
+  INT {
+    cout << "types INT" << endl;
+    $$ = StringNode::Create("INT");
+  }
+  |
+  DOUBLE {
+    cout << "types DOUBLE" << endl;
+    $$ = StringNode::Create("DOUBLE");
+  }
+  |
+  STRING {
+    cout << "types STRING" << endl;
+    $$ = StringNode::Create("STRING");
   };
 
 eols:

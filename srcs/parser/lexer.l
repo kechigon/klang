@@ -5,10 +5,12 @@
   using namespace std;
 %}
 %option noyywrap
+%option nounput
+%option noinput
 WHITESPACE      [ \t]
-INT             [-\+]*[0-9]+
-DOUBLE           {INT}\.[0-9]+
-STRING          \"[^"]*\"|\'[^']*\'
+INTLITERAL      [0-9]+
+DOUBLELITERAL   {INTLITERAL}\.[0-9]+
+STRINGLITERAL   \"[^"]*\"|\'[^']*\'
 COMMENT         "/*"([^\*]|(\*)*[^\*/])*(\*)*"*/"
 IDENTIFIER      [a-zA-Z_][0-9a-zA-Z_]*
 
@@ -35,20 +37,23 @@ RETURN          return
 DOT             \.
 COMMA           ,
 INPUT           #
-OUTPUT          @
+OUTPUT          \$
 IF              if
 ELSE            else
 FOR             for
 WHILE           while
 BREAK           break
 CONTINUE        continue
-FUNC            func
 LEFT_PAREN      \(
 RIGHT_PAREN     \)
 LEFT_BRACE      \{
 RIGHT_BRACE     \}
 RIGHT_BRACKET   \]
-IDENT_DECL      \$
+INT             int
+DOUBLE          double
+STRING          string
+VOID            void
+SEMICOLON       ;
 EOL             \n|\r\n
 
 %%
@@ -58,19 +63,19 @@ EOL             \n|\r\n
 
 {WHITESPACE} ;
 
-{INT} {
-  yylval.lval = atol(yytext); 
-  return INT; 
+{INTLITERAL} {
+  yylval.lval = atol(yytext);
+  return INTLITERAL;
 }
 
-{DOUBLE} {
+{DOUBLELITERAL} {
   yylval.dval = atof(yytext); 
-  return DOUBLE; 
+  return DOUBLELITERAL; 
 }
 
-{STRING} {
+{STRINGLITERAL} {
   yylval.sval = strdup(yytext); 
-  return STRING;
+  return STRINGLITERAL;
 }
 
 {EQUAL} {
@@ -193,10 +198,6 @@ EOL             \n|\r\n
   return CONTINUE;
 }
 
-{FUNC} {
-  return FUNC;
-}
-
 {LEFT_PAREN} {
   return LEFT_PAREN;
 }
@@ -215,17 +216,33 @@ EOL             \n|\r\n
 
 {COMMENT} ;
 
-{IDENTIFIER} {
-  yylval.sval = strdup(yytext); 
-  return IDENTIFIER;
-}
-
 {RIGHT_BRACKET} {
   return RIGHT_BRACKET;
 }
 
-{IDENT_DECL} {
-  return IDENT_DECL;
+{INT} {
+  return INT;
+}
+
+{DOUBLE} {
+  return DOUBLE;
+}
+
+{STRING} {
+  return STRING;
+}
+
+{VOID} {
+  return VOID;
+}
+
+{SEMICOLON} {
+  return SEMICOLON;
+}
+
+{IDENTIFIER} {
+  yylval.sval = strdup(yytext); 
+  return IDENTIFIER;
 }
 
 <<EOF>> {

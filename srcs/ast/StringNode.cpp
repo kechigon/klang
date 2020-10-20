@@ -19,3 +19,12 @@ StringNode* StringNode::Create(std::string _value) {
 NodeType StringNode::getType() {
 	return string_node_t;
 }
+
+bool StringNode::isLiteral() {
+	return Literal;
+}
+
+void StringNode::setIsLiteral() {
+	Literal = true;
+}
+

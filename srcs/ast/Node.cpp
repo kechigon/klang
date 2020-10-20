@@ -101,6 +101,7 @@ std::string Node::getTypeName() {
         case int_node_t: return "IntNode";
         case string_node_t: return "StringNode";
         case double_node_t: return "doubleNode";
+        case arr_ele_node_t: return "ArrEleNode";
     }
 }
 
@@ -129,5 +130,13 @@ bool Node::checknext(){
 }
 
 int Node::getArrEleType(){
+
+}
+
+bool Node::isLiteral(){
+
+}
+
+void Node::setIsLiteral(){
 
 }
