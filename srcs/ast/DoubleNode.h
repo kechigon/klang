@@ -8,7 +8,7 @@ class DoubleNode: public Node {
 public:
 	static DoubleNode* Create(double num);
 	virtual NodeType getType();
-	virtual double getdouble();
+	double getdouble();
 	
 protected:
 	double value;

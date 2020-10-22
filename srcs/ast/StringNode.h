@@ -9,7 +9,7 @@ class StringNode : public Node
 public:
   static StringNode* Create(const char* _value);
 	static StringNode* Create(std::string _value);
-	virtual std::string getStr() { return value; }
+	std::string getStr() { return value; }
 	virtual NodeType getType();
 	bool isLiteral();
 	void setIsLiteral();

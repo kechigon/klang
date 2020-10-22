@@ -64,7 +64,7 @@ EOL             \n|\r\n
 {WHITESPACE} ;
 
 {INTLITERAL} {
-  yylval.lval = atol(yytext);
+  yylval.ival = atoi(yytext);
   return INTLITERAL;
 }
 

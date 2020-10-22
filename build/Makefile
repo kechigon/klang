@@ -39,7 +39,7 @@ error.o: ../srcs/error.cpp
 	g++ -c ${CFLAG} ../srcs/error.cpp
 
 clean:
-	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o
+	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o *.ll a.txt klang
 
 re: clean klang
 

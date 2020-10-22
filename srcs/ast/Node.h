@@ -26,13 +26,6 @@ public:
     Node* getNext() { return next; }
     Node* getChild() { return child; }
 
-    virtual std::string getStr();
-    virtual std::string getStr1();
-    virtual std::string getStr2();
-    virtual int getint();
-    virtual double getdouble();
-    virtual int getArrEleType();
-
     std::string getTypeName();
     virtual NodeType getType();
     bool isNode();
@@ -45,9 +38,6 @@ public:
 
     void check() {check_flag = true;};
     bool ischecked() {return check_flag;};
-
-    bool isLiteral();
-    void setIsLiteral();
 
 protected:
     void init();

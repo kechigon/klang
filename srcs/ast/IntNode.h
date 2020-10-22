@@ -7,7 +7,7 @@ class IntNode: public Node {
 public: 
   static IntNode* Create(int num);
 	virtual NodeType getType();
-	virtual int getint();
+	int getint();
 	
 protected:
 	IntNode(int num);

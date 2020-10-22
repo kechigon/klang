@@ -8,17 +8,24 @@ extern Node* program;
 int yyparse();
 void showAST(Node* node);
 extern FILE *yyin;
-
 void yyerror(const char *s);
+bool show_syntax = false;
+bool show_mean = false;
+bool show_module =false;
+void printError(std::string st);
 
 int main(int argc, char* argv[]){
-  if(argc < 2){
-    cout << "Please specify the file" << endl;
-    return -1;
-  }
-  if(argc > 2){
-    cerr << "Too many arguments" << endl;
-    return -1;
+  if(argc < 2) printError("Please specify the file");
+  if(argc > 3) printError("Too many arguments");
+  if(argc == 3){
+    string option = argv[2];
+    if(option.length() > 4 || option.length() == 1) printError("Invalid Options");
+    for(int i = 1; i < ((int)option.length()); i++) {
+      if(option[i] == 's') show_syntax = true;
+      else if(option[i] == 'm') show_mean = true;
+      else if(option[i] == 'l') show_module = true;
+      else printError("Invalid Options");
+    }
   }
 
   FILE *myfile = fopen(argv[1], "r");
@@ -30,19 +37,23 @@ int main(int argc, char* argv[]){
 
   yyin = myfile;
 
-  printf("\n");
-  cout << "-----syntax check-----" << endl;
-  printf("\n");
+  if(show_syntax) {
+    printf("\n");
+    cout << "-----syntax check-----" << endl;
+    printf("\n");
+  }
 
   yyparse();
 
-  printf("\n");
-  cout << "-----Show meaning-----" << endl;
-  printf("\n");
+  if(show_mean) {
+    printf("\n");
+    cout << "-----Show meaning-----" << endl;
+    printf("\n");
 
-  showAST(program);
+    showAST(program);
+  }
 
-  printf("\n");
+  if(show_module)printf("\n");
   CodeGen* codegen = new CodeGen(program);
 	codegen->Make();
 	delete codegen;

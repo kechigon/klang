@@ -12,6 +12,7 @@ void register_printNewLine(llvm::Module *module);
 void register_scanInt(llvm::Module *module);
 void register_scanDouble(llvm::Module *module);
 //void register_scanStr(llvm::Module *module);
+extern bool show_module;
 
 CodeGen::CodeGen(Node* node) {
   context = new CodeGenContext(node); 
@@ -52,8 +53,10 @@ void CodeGen::Make() {
 		std::cout << "LLVM bytecode error!\n";
 		exit(1);
 	}
-  llvm::outs() << "-----LLVM module-----\n\n" << *M;
-  llvm::outs().flush();
+  if(show_module) {
+    llvm::outs() << "-----LLVM module-----\n\n" << *M;
+    llvm::outs().flush();
+  }
 
   std::error_code ErrInfo;
 	llvm::raw_ostream *out = new llvm::raw_fd_ostream("out.ll", ErrInfo, llvm::sys::fs::F_None);

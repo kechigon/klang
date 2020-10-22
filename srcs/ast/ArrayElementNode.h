@@ -9,11 +9,11 @@ class ArrayElementNode : public Node
 public:
   static ArrayElementNode* Create(const char* _value, int n);
 	static ArrayElementNode* Create(const char* _value1, const char* _value2);
-	virtual std::string getStr1() { return value1; }
-	virtual std::string getStr2() { return value2; }
-  virtual int getint();
+	std::string getStr1() { return value1; }
+	std::string getStr2() { return value2; }
+  int getint();
 	virtual NodeType getType();
-	virtual int getArrEleType();
+	int getArrEleType();
 
 protected:
 	ArrayElementNode(const char* _value, int n);
