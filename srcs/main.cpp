@@ -45,6 +45,6 @@ int main(int argc, char* argv[]){
   printf("\n");
   CodeGen* codegen = new CodeGen(program);
 	codegen->Make();
-	//delete codegen;
+	delete codegen;
   fclose(myfile);
 }

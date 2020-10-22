@@ -101,7 +101,7 @@ static llvm::Value* INPUT_macro(CodeGenContext* context, Node* node) {
 		node->check();
 		if(id->type == int_type) return builder.CreateCall(context->FindFunc("scanInt"), std::vector<llvm::Value *>(1, id->data));
 		else if(id->type == double_type) return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id->data));
-		else if(id->type == string_type) return builder.CreateCall(context->FindFunc("scanStr"), std::vector<llvm::Value *>(1, id->data));
+		//else if(id->type == string_type) return builder.CreateCall(context->FindFunc("scanStr"), std::vector<llvm::Value *>(1, id->data));
 		else return NULL;
 	}
 	else {

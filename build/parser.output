@@ -1,0 +1,4286 @@
+Grammar
+
+    0 $accept: program END
+
+    1 program: blocks
+
+    2 blocks: elements
+    3       | eols elements
+    4       | func_blocks elements
+    5       | eols func_blocks elements
+
+    6 func_blocks: func_blocks func_block
+    7            | func_block
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+    9           | types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   10           | VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   11           | VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+   12 elements: elements element
+   13         | element
+
+   14 element: element_content eols
+   15        | element_content END
+
+   16 element_content: declaration
+   17                | input_output
+   18                | subst_calc
+   19                | subst_calc_2
+   20                | if_stmt
+   21                | WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   22                | for_stmt
+   23                | BREAK
+   24                | CONTINUE
+   25                | RETURN expression
+   26                | RETURN STRINGLITERAL
+   27                | func_exe
+   28                | SEMICOLON
+
+   29 declaration: types identifiers
+   30            | declaration_subst_calc
+
+   31 declaration_subst_calc: types subst_calc
+
+   32 input_output: INPUT identifiers
+   33             | outputs
+
+   34 outputs: outputs OUTPUT expression
+   35        | outputs OUTPUT STRINGLITERAL
+   36        | OUTPUT expression
+   37        | OUTPUT STRINGLITERAL
+
+   38 identifiers: identifiers COMMA IDENTIFIER
+   39            | identifiers COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers COMMA IDENTIFIER DOT IDENTIFIER
+   41            | IDENTIFIER
+   42            | IDENTIFIER DOT INTLITERAL
+   43            | IDENTIFIER DOT IDENTIFIER
+
+   44 subst_calc: identifiers SUBST expression
+   45           | identifiers SUBST STRINGLITERAL
+
+   46 subst_calc_2: identifiers ADD_SUBST expression
+   47             | identifiers SUBT_SUBST expression
+   48             | identifiers MULT_SUBST expression
+   49             | identifiers DIV_SUBST expression
+   50             | identifiers MOD_SUBST expression
+
+   51 expression: expression PLUS expression
+   52           | expression MINUS expression
+   53           | expression MULT expression
+   54           | expression DIV expression
+   55           | expression MOD expression
+   56           | expression EQUAL expression
+   57           | expression NOT_EQUAL expression
+   58           | expression MORE_EQUAL expression
+   59           | expression LESS_EQUAL expression
+   60           | expression MORE expression
+   61           | expression LESS expression
+   62           | expression AND expression
+   63           | expression OR expression
+   64           | monomial
+   65           | MINUS expression
+   66           | LEFT_PAREN expression RIGHT_PAREN
+
+   67 monomial: INTLITERAL
+   68         | DOUBLELITERAL
+   69         | IDENTIFIER
+   70         | IDENTIFIER DOT INTLITERAL
+   71         | IDENTIFIER DOT IDENTIFIER
+   72         | func_exe
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+   77 else_if_stmts: else_if_stmts RIGHT_BRACE EOL else_if_stmt
+   78              | else_if_stmt
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   82         | FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   84         | FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+   86 func_exe: IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN
+   87         | IDENTIFIER LEFT_PAREN RIGHT_PAREN
+
+   88 args: args COMMA types IDENTIFIER
+   89     | types IDENTIFIER
+
+   90 types: INT
+   91      | DOUBLE
+   92      | STRING
+
+   93 eols: eols EOL
+   94     | EOL
+
+
+Terminals, with rules where they appear
+
+END (0) 0 15
+error (256)
+INTLITERAL (258) 39 42 67 70
+DOUBLELITERAL (259) 68
+STRINGLITERAL (260) 26 35 37 45
+IDENTIFIER (261) 8 9 10 11 38 39 40 41 42 43 69 70 71 86 87 88 89
+EQUAL (262) 56
+NOT_EQUAL (263) 57
+MORE_EQUAL (264) 58
+LESS_EQUAL (265) 59
+MORE (266) 60
+LESS (267) 61
+SUBST (268) 44 45
+PLUS (269) 51
+MINUS (270) 52 65
+MULT (271) 53
+DIV (272) 54
+AND (273) 62
+MOD (274) 55
+OR (275) 63
+ADD_SUBST (276) 46
+SUBT_SUBST (277) 47
+MULT_SUBST (278) 48
+DIV_SUBST (279) 49
+MOD_SUBST (280) 50
+RETURN (281) 25 26
+DOT (282) 39 40 42 43 70 71
+COMMA (283) 38 39 40 80 81 82 83 84 85 88
+INPUT (284) 32
+OUTPUT (285) 34 35 36 37
+IF (286) 73 74 75 76 79
+ELSE (287) 74 76 79
+FOR (288) 80 81 82 83 84 85
+WHILE (289) 21
+BREAK (290) 23
+CONTINUE (291) 24
+LEFT_PAREN (292) 8 9 10 11 21 66 73 74 75 76 79 80 81 82 83 84 85 86
+    87
+RIGHT_PAREN (293) 8 9 10 11 21 66 73 74 75 76 79 80 81 82 83 84 85
+    86 87
+LEFT_BRACE (294) 8 9 10 11 21 73 74 75 76 79 80 81 82 83 84 85
+RIGHT_BRACE (295) 8 9 10 11 21 74 75 76 77 80 81 82 83 84 85
+RIGHT_BRACKET (296) 73 74 75 76
+INT (297) 90
+DOUBLE (298) 91
+STRING (299) 92
+VOID (300) 10 11
+SEMICOLON (301) 28
+EOL (302) 8 9 10 11 21 73 74 75 76 77 79 80 81 82 83 84 85 93 94
+UMINUS (303)
+
+
+Nonterminals, with rules where they appear
+
+$accept (49)
+    on left: 0
+program (50)
+    on left: 1, on right: 0
+blocks (51)
+    on left: 2 3 4 5, on right: 1
+func_blocks (52)
+    on left: 6 7, on right: 4 5 6
+func_block (53)
+    on left: 8 9 10 11, on right: 6 7
+elements (54)
+    on left: 12 13, on right: 2 3 4 5 8 9 10 11 12 21 73 74 75 76 79
+    80 81 82 83 84 85
+element (55)
+    on left: 14 15, on right: 12 13
+element_content (56)
+    on left: 16 17 18 19 20 21 22 23 24 25 26 27 28, on right: 14 15
+declaration (57)
+    on left: 29 30, on right: 16
+declaration_subst_calc (58)
+    on left: 31, on right: 30 80 81
+input_output (59)
+    on left: 32 33, on right: 17
+outputs (60)
+    on left: 34 35 36 37, on right: 33 34 35
+identifiers (61)
+    on left: 38 39 40 41 42 43, on right: 29 32 38 39 40 44 45 46 47
+    48 49 50 86
+subst_calc (62)
+    on left: 44 45, on right: 18 31 80 82 83 84
+subst_calc_2 (63)
+    on left: 46 47 48 49 50, on right: 19 81 83 84 85
+expression (64)
+    on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66, on right:
+    21 25 34 36 44 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61
+    62 63 65 66 73 74 75 76 79 80 81 82 83 84 85
+monomial (65)
+    on left: 67 68 69 70 71 72, on right: 64
+if_stmt (66)
+    on left: 73 74 75 76, on right: 20
+else_if_stmts (67)
+    on left: 77 78, on right: 75 76 77
+else_if_stmt (68)
+    on left: 79, on right: 77 78
+for_stmt (69)
+    on left: 80 81 82 83 84 85, on right: 22
+func_exe (70)
+    on left: 86 87, on right: 27 72
+args (71)
+    on left: 88 89, on right: 8 10 88
+types (72)
+    on left: 90 91 92, on right: 8 9 29 31 88 89
+eols (73)
+    on left: 93 94, on right: 3 5 8 9 10 11 14 93
+
+
+State 0
+
+    0 $accept: . program END
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    VOID        shift, and go to state 13
+    SEMICOLON   shift, and go to state 14
+    EOL         shift, and go to state 15
+
+    program                 go to state 16
+    blocks                  go to state 17
+    func_blocks             go to state 18
+    func_block              go to state 19
+    elements                go to state 20
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 33
+    eols                    go to state 34
+
+
+State 1
+
+   41 identifiers: IDENTIFIER .
+   42            | IDENTIFIER . DOT INTLITERAL
+   43            | IDENTIFIER . DOT IDENTIFIER
+   86 func_exe: IDENTIFIER . LEFT_PAREN identifiers RIGHT_PAREN
+   87         | IDENTIFIER . LEFT_PAREN RIGHT_PAREN
+
+    DOT         shift, and go to state 35
+    LEFT_PAREN  shift, and go to state 36
+
+    $default  reduce using rule 41 (identifiers)
+
+
+State 2
+
+   25 element_content: RETURN . expression
+   26                | RETURN . STRINGLITERAL
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    STRINGLITERAL  shift, and go to state 39
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 43
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 3
+
+   32 input_output: INPUT . identifiers
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers  go to state 47
+
+
+State 4
+
+   36 outputs: OUTPUT . expression
+   37        | OUTPUT . STRINGLITERAL
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    STRINGLITERAL  shift, and go to state 48
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 49
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 5
+
+   73 if_stmt: IF . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    LEFT_PAREN  shift, and go to state 50
+
+
+State 6
+
+   80 for_stmt: FOR . LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR . LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   82         | FOR . LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR . LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   84         | FOR . LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR . LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_PAREN  shift, and go to state 51
+
+
+State 7
+
+   21 element_content: WHILE . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_PAREN  shift, and go to state 52
+
+
+State 8
+
+   23 element_content: BREAK .
+
+    $default  reduce using rule 23 (element_content)
+
+
+State 9
+
+   24 element_content: CONTINUE .
+
+    $default  reduce using rule 24 (element_content)
+
+
+State 10
+
+   90 types: INT .
+
+    $default  reduce using rule 90 (types)
+
+
+State 11
+
+   91 types: DOUBLE .
+
+    $default  reduce using rule 91 (types)
+
+
+State 12
+
+   92 types: STRING .
+
+    $default  reduce using rule 92 (types)
+
+
+State 13
+
+   10 func_block: VOID . IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   11           | VOID . IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    IDENTIFIER  shift, and go to state 53
+
+
+State 14
+
+   28 element_content: SEMICOLON .
+
+    $default  reduce using rule 28 (element_content)
+
+
+State 15
+
+   94 eols: EOL .
+
+    $default  reduce using rule 94 (eols)
+
+
+State 16
+
+    0 $accept: program . END
+
+    END  shift, and go to state 54
+
+
+State 17
+
+    1 program: blocks .
+
+    $default  reduce using rule 1 (program)
+
+
+State 18
+
+    4 blocks: func_blocks . elements
+    6 func_blocks: func_blocks . func_block
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    VOID        shift, and go to state 13
+    SEMICOLON   shift, and go to state 14
+
+    func_block              go to state 55
+    elements                go to state 56
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 33
+
+
+State 19
+
+    7 func_blocks: func_block .
+
+    $default  reduce using rule 7 (func_blocks)
+
+
+State 20
+
+    2 blocks: elements .
+   12 elements: elements . element
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    $default  reduce using rule 2 (blocks)
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 21
+
+   13 elements: element .
+
+    $default  reduce using rule 13 (elements)
+
+
+State 22
+
+   14 element: element_content . eols
+   15        | element_content . END
+
+    END  shift, and go to state 59
+    EOL  shift, and go to state 15
+
+    eols  go to state 60
+
+
+State 23
+
+   16 element_content: declaration .
+
+    $default  reduce using rule 16 (element_content)
+
+
+State 24
+
+   30 declaration: declaration_subst_calc .
+
+    $default  reduce using rule 30 (declaration)
+
+
+State 25
+
+   17 element_content: input_output .
+
+    $default  reduce using rule 17 (element_content)
+
+
+State 26
+
+   33 input_output: outputs .
+   34 outputs: outputs . OUTPUT expression
+   35        | outputs . OUTPUT STRINGLITERAL
+
+    OUTPUT  shift, and go to state 61
+
+    $default  reduce using rule 33 (input_output)
+
+
+State 27
+
+   38 identifiers: identifiers . COMMA IDENTIFIER
+   39            | identifiers . COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers . COMMA IDENTIFIER DOT IDENTIFIER
+   44 subst_calc: identifiers . SUBST expression
+   45           | identifiers . SUBST STRINGLITERAL
+   46 subst_calc_2: identifiers . ADD_SUBST expression
+   47             | identifiers . SUBT_SUBST expression
+   48             | identifiers . MULT_SUBST expression
+   49             | identifiers . DIV_SUBST expression
+   50             | identifiers . MOD_SUBST expression
+
+    SUBST       shift, and go to state 62
+    ADD_SUBST   shift, and go to state 63
+    SUBT_SUBST  shift, and go to state 64
+    MULT_SUBST  shift, and go to state 65
+    DIV_SUBST   shift, and go to state 66
+    MOD_SUBST   shift, and go to state 67
+    COMMA       shift, and go to state 68
+
+
+State 28
+
+   18 element_content: subst_calc .
+
+    $default  reduce using rule 18 (element_content)
+
+
+State 29
+
+   19 element_content: subst_calc_2 .
+
+    $default  reduce using rule 19 (element_content)
+
+
+State 30
+
+   20 element_content: if_stmt .
+
+    $default  reduce using rule 20 (element_content)
+
+
+State 31
+
+   22 element_content: for_stmt .
+
+    $default  reduce using rule 22 (element_content)
+
+
+State 32
+
+   27 element_content: func_exe .
+
+    $default  reduce using rule 27 (element_content)
+
+
+State 33
+
+    8 func_block: types . IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+    9           | types . IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   29 declaration: types . identifiers
+   31 declaration_subst_calc: types . subst_calc
+
+    IDENTIFIER  shift, and go to state 69
+
+    identifiers  go to state 70
+    subst_calc   go to state 71
+
+
+State 34
+
+    3 blocks: eols . elements
+    5       | eols . func_blocks elements
+   93 eols: eols . EOL
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    VOID        shift, and go to state 13
+    SEMICOLON   shift, and go to state 14
+    EOL         shift, and go to state 72
+
+    func_blocks             go to state 73
+    func_block              go to state 19
+    elements                go to state 74
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 33
+
+
+State 35
+
+   42 identifiers: IDENTIFIER DOT . INTLITERAL
+   43            | IDENTIFIER DOT . IDENTIFIER
+
+    INTLITERAL  shift, and go to state 75
+    IDENTIFIER  shift, and go to state 76
+
+
+State 36
+
+   86 func_exe: IDENTIFIER LEFT_PAREN . identifiers RIGHT_PAREN
+   87         | IDENTIFIER LEFT_PAREN . RIGHT_PAREN
+
+    IDENTIFIER   shift, and go to state 46
+    RIGHT_PAREN  shift, and go to state 77
+
+    identifiers  go to state 78
+
+
+State 37
+
+   67 monomial: INTLITERAL .
+
+    $default  reduce using rule 67 (monomial)
+
+
+State 38
+
+   68 monomial: DOUBLELITERAL .
+
+    $default  reduce using rule 68 (monomial)
+
+
+State 39
+
+   26 element_content: RETURN STRINGLITERAL .
+
+    $default  reduce using rule 26 (element_content)
+
+
+State 40
+
+   69 monomial: IDENTIFIER .
+   70         | IDENTIFIER . DOT INTLITERAL
+   71         | IDENTIFIER . DOT IDENTIFIER
+   86 func_exe: IDENTIFIER . LEFT_PAREN identifiers RIGHT_PAREN
+   87         | IDENTIFIER . LEFT_PAREN RIGHT_PAREN
+
+    DOT         shift, and go to state 79
+    LEFT_PAREN  shift, and go to state 36
+
+    $default  reduce using rule 69 (monomial)
+
+
+State 41
+
+   65 expression: MINUS . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 80
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 42
+
+   66 expression: LEFT_PAREN . expression RIGHT_PAREN
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 81
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 43
+
+   25 element_content: RETURN expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 25 (element_content)
+
+
+State 44
+
+   64 expression: monomial .
+
+    $default  reduce using rule 64 (expression)
+
+
+State 45
+
+   72 monomial: func_exe .
+
+    $default  reduce using rule 72 (monomial)
+
+
+State 46
+
+   41 identifiers: IDENTIFIER .
+   42            | IDENTIFIER . DOT INTLITERAL
+   43            | IDENTIFIER . DOT IDENTIFIER
+
+    DOT  shift, and go to state 35
+
+    $default  reduce using rule 41 (identifiers)
+
+
+State 47
+
+   32 input_output: INPUT identifiers .
+   38 identifiers: identifiers . COMMA IDENTIFIER
+   39            | identifiers . COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers . COMMA IDENTIFIER DOT IDENTIFIER
+
+    COMMA  shift, and go to state 68
+
+    $default  reduce using rule 32 (input_output)
+
+
+State 48
+
+   37 outputs: OUTPUT STRINGLITERAL .
+
+    $default  reduce using rule 37 (outputs)
+
+
+State 49
+
+   36 outputs: OUTPUT expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 36 (outputs)
+
+
+State 50
+
+   73 if_stmt: IF LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 95
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 51
+
+   80 for_stmt: FOR LEFT_PAREN . declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN . declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   82         | FOR LEFT_PAREN . subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN . subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   84         | FOR LEFT_PAREN . subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN . subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 46
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+
+    declaration_subst_calc  go to state 96
+    identifiers             go to state 27
+    subst_calc              go to state 97
+    subst_calc_2            go to state 98
+    types                   go to state 99
+
+
+State 52
+
+   21 element_content: WHILE LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 100
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 53
+
+   10 func_block: VOID IDENTIFIER . LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   11           | VOID IDENTIFIER . LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    LEFT_PAREN  shift, and go to state 101
+
+
+State 54
+
+    0 $accept: program END .
+
+    $default  accept
+
+
+State 55
+
+    6 func_blocks: func_blocks func_block .
+
+    $default  reduce using rule 6 (func_blocks)
+
+
+State 56
+
+    4 blocks: func_blocks elements .
+   12 elements: elements . element
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    $default  reduce using rule 4 (blocks)
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 57
+
+   12 elements: elements element .
+
+    $default  reduce using rule 12 (elements)
+
+
+State 58
+
+   29 declaration: types . identifiers
+   31 declaration_subst_calc: types . subst_calc
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers  go to state 70
+    subst_calc   go to state 71
+
+
+State 59
+
+   15 element: element_content END .
+
+    $default  reduce using rule 15 (element)
+
+
+State 60
+
+   14 element: element_content eols .
+   93 eols: eols . EOL
+
+    EOL  shift, and go to state 72
+
+    $default  reduce using rule 14 (element)
+
+
+State 61
+
+   34 outputs: outputs OUTPUT . expression
+   35        | outputs OUTPUT . STRINGLITERAL
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    STRINGLITERAL  shift, and go to state 102
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 103
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 62
+
+   44 subst_calc: identifiers SUBST . expression
+   45           | identifiers SUBST . STRINGLITERAL
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    STRINGLITERAL  shift, and go to state 104
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 105
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 63
+
+   46 subst_calc_2: identifiers ADD_SUBST . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 106
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 64
+
+   47 subst_calc_2: identifiers SUBT_SUBST . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 107
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 65
+
+   48 subst_calc_2: identifiers MULT_SUBST . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 108
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 66
+
+   49 subst_calc_2: identifiers DIV_SUBST . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 109
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 67
+
+   50 subst_calc_2: identifiers MOD_SUBST . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 110
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 68
+
+   38 identifiers: identifiers COMMA . IDENTIFIER
+   39            | identifiers COMMA . IDENTIFIER DOT INTLITERAL
+   40            | identifiers COMMA . IDENTIFIER DOT IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 111
+
+
+State 69
+
+    8 func_block: types IDENTIFIER . LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+    9           | types IDENTIFIER . LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   41 identifiers: IDENTIFIER .
+   42            | IDENTIFIER . DOT INTLITERAL
+   43            | IDENTIFIER . DOT IDENTIFIER
+
+    DOT         shift, and go to state 35
+    LEFT_PAREN  shift, and go to state 112
+
+    $default  reduce using rule 41 (identifiers)
+
+
+State 70
+
+   29 declaration: types identifiers .
+   38 identifiers: identifiers . COMMA IDENTIFIER
+   39            | identifiers . COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers . COMMA IDENTIFIER DOT IDENTIFIER
+   44 subst_calc: identifiers . SUBST expression
+   45           | identifiers . SUBST STRINGLITERAL
+
+    SUBST  shift, and go to state 62
+    COMMA  shift, and go to state 68
+
+    $default  reduce using rule 29 (declaration)
+
+
+State 71
+
+   31 declaration_subst_calc: types subst_calc .
+
+    $default  reduce using rule 31 (declaration_subst_calc)
+
+
+State 72
+
+   93 eols: eols EOL .
+
+    $default  reduce using rule 93 (eols)
+
+
+State 73
+
+    5 blocks: eols func_blocks . elements
+    6 func_blocks: func_blocks . func_block
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    VOID        shift, and go to state 13
+    SEMICOLON   shift, and go to state 14
+
+    func_block              go to state 55
+    elements                go to state 113
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 33
+
+
+State 74
+
+    3 blocks: eols elements .
+   12 elements: elements . element
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    $default  reduce using rule 3 (blocks)
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 75
+
+   42 identifiers: IDENTIFIER DOT INTLITERAL .
+
+    $default  reduce using rule 42 (identifiers)
+
+
+State 76
+
+   43 identifiers: IDENTIFIER DOT IDENTIFIER .
+
+    $default  reduce using rule 43 (identifiers)
+
+
+State 77
+
+   87 func_exe: IDENTIFIER LEFT_PAREN RIGHT_PAREN .
+
+    $default  reduce using rule 87 (func_exe)
+
+
+State 78
+
+   38 identifiers: identifiers . COMMA IDENTIFIER
+   39            | identifiers . COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers . COMMA IDENTIFIER DOT IDENTIFIER
+   86 func_exe: IDENTIFIER LEFT_PAREN identifiers . RIGHT_PAREN
+
+    COMMA        shift, and go to state 68
+    RIGHT_PAREN  shift, and go to state 114
+
+
+State 79
+
+   70 monomial: IDENTIFIER DOT . INTLITERAL
+   71         | IDENTIFIER DOT . IDENTIFIER
+
+    INTLITERAL  shift, and go to state 115
+    IDENTIFIER  shift, and go to state 116
+
+
+State 80
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   65           | MINUS expression .
+
+    $default  reduce using rule 65 (expression)
+
+
+State 81
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   66           | LEFT_PAREN expression . RIGHT_PAREN
+
+    EQUAL        shift, and go to state 82
+    NOT_EQUAL    shift, and go to state 83
+    MORE_EQUAL   shift, and go to state 84
+    LESS_EQUAL   shift, and go to state 85
+    MORE         shift, and go to state 86
+    LESS         shift, and go to state 87
+    PLUS         shift, and go to state 88
+    MINUS        shift, and go to state 89
+    MULT         shift, and go to state 90
+    DIV          shift, and go to state 91
+    AND          shift, and go to state 92
+    MOD          shift, and go to state 93
+    OR           shift, and go to state 94
+    RIGHT_PAREN  shift, and go to state 117
+
+
+State 82
+
+   56 expression: expression EQUAL . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 118
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 83
+
+   57 expression: expression NOT_EQUAL . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 119
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 84
+
+   58 expression: expression MORE_EQUAL . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 120
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 85
+
+   59 expression: expression LESS_EQUAL . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 121
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 86
+
+   60 expression: expression MORE . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 122
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 87
+
+   61 expression: expression LESS . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 123
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 88
+
+   51 expression: expression PLUS . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 124
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 89
+
+   52 expression: expression MINUS . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 125
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 90
+
+   53 expression: expression MULT . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 126
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 91
+
+   54 expression: expression DIV . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 127
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 92
+
+   62 expression: expression AND . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 128
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 93
+
+   55 expression: expression MOD . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 129
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 94
+
+   63 expression: expression OR . expression
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 130
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 95
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   73 if_stmt: IF LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    EQUAL        shift, and go to state 82
+    NOT_EQUAL    shift, and go to state 83
+    MORE_EQUAL   shift, and go to state 84
+    LESS_EQUAL   shift, and go to state 85
+    MORE         shift, and go to state 86
+    LESS         shift, and go to state 87
+    PLUS         shift, and go to state 88
+    MINUS        shift, and go to state 89
+    MULT         shift, and go to state 90
+    DIV          shift, and go to state 91
+    AND          shift, and go to state 92
+    MOD          shift, and go to state 93
+    OR           shift, and go to state 94
+    RIGHT_PAREN  shift, and go to state 131
+
+
+State 96
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc . COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN declaration_subst_calc . COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    COMMA  shift, and go to state 132
+
+
+State 97
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc . COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN subst_calc . COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    COMMA  shift, and go to state 133
+
+
+State 98
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 . COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN subst_calc_2 . COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    COMMA  shift, and go to state 134
+
+
+State 99
+
+   31 declaration_subst_calc: types . subst_calc
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers  go to state 135
+    subst_calc   go to state 71
+
+
+State 100
+
+   21 element_content: WHILE LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL        shift, and go to state 82
+    NOT_EQUAL    shift, and go to state 83
+    MORE_EQUAL   shift, and go to state 84
+    LESS_EQUAL   shift, and go to state 85
+    MORE         shift, and go to state 86
+    LESS         shift, and go to state 87
+    PLUS         shift, and go to state 88
+    MINUS        shift, and go to state 89
+    MULT         shift, and go to state 90
+    DIV          shift, and go to state 91
+    AND          shift, and go to state 92
+    MOD          shift, and go to state 93
+    OR           shift, and go to state 94
+    RIGHT_PAREN  shift, and go to state 136
+
+
+State 101
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN . args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   11           | VOID IDENTIFIER LEFT_PAREN . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    RIGHT_PAREN  shift, and go to state 137
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+
+    args   go to state 138
+    types  go to state 139
+
+
+State 102
+
+   35 outputs: outputs OUTPUT STRINGLITERAL .
+
+    $default  reduce using rule 35 (outputs)
+
+
+State 103
+
+   34 outputs: outputs OUTPUT expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 34 (outputs)
+
+
+State 104
+
+   45 subst_calc: identifiers SUBST STRINGLITERAL .
+
+    $default  reduce using rule 45 (subst_calc)
+
+
+State 105
+
+   44 subst_calc: identifiers SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 44 (subst_calc)
+
+
+State 106
+
+   46 subst_calc_2: identifiers ADD_SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 46 (subst_calc_2)
+
+
+State 107
+
+   47 subst_calc_2: identifiers SUBT_SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 47 (subst_calc_2)
+
+
+State 108
+
+   48 subst_calc_2: identifiers MULT_SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 48 (subst_calc_2)
+
+
+State 109
+
+   49 subst_calc_2: identifiers DIV_SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 49 (subst_calc_2)
+
+
+State 110
+
+   50 subst_calc_2: identifiers MOD_SUBST expression .
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+
+    $default  reduce using rule 50 (subst_calc_2)
+
+
+State 111
+
+   38 identifiers: identifiers COMMA IDENTIFIER .
+   39            | identifiers COMMA IDENTIFIER . DOT INTLITERAL
+   40            | identifiers COMMA IDENTIFIER . DOT IDENTIFIER
+
+    DOT  shift, and go to state 140
+
+    $default  reduce using rule 38 (identifiers)
+
+
+State 112
+
+    8 func_block: types IDENTIFIER LEFT_PAREN . args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+    9           | types IDENTIFIER LEFT_PAREN . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    RIGHT_PAREN  shift, and go to state 141
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+
+    args   go to state 142
+    types  go to state 139
+
+
+State 113
+
+    5 blocks: eols func_blocks elements .
+   12 elements: elements . element
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    $default  reduce using rule 5 (blocks)
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 114
+
+   86 func_exe: IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN .
+
+    $default  reduce using rule 86 (func_exe)
+
+
+State 115
+
+   70 monomial: IDENTIFIER DOT INTLITERAL .
+
+    $default  reduce using rule 70 (monomial)
+
+
+State 116
+
+   71 monomial: IDENTIFIER DOT IDENTIFIER .
+
+    $default  reduce using rule 71 (monomial)
+
+
+State 117
+
+   66 expression: LEFT_PAREN expression RIGHT_PAREN .
+
+    $default  reduce using rule 66 (expression)
+
+
+State 118
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   56           | expression EQUAL expression .
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 56 (expression)
+
+
+State 119
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   57           | expression NOT_EQUAL expression .
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 57 (expression)
+
+
+State 120
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   58           | expression MORE_EQUAL expression .
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 58 (expression)
+
+
+State 121
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   59           | expression LESS_EQUAL expression .
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 59 (expression)
+
+
+State 122
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   60           | expression MORE expression .
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 60 (expression)
+
+
+State 123
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   61           | expression LESS expression .
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    PLUS   shift, and go to state 88
+    MINUS  shift, and go to state 89
+    MULT   shift, and go to state 90
+    DIV    shift, and go to state 91
+    MOD    shift, and go to state 93
+
+    $default  reduce using rule 61 (expression)
+
+
+State 124
+
+   51 expression: expression . PLUS expression
+   51           | expression PLUS expression .
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    MULT  shift, and go to state 90
+    DIV   shift, and go to state 91
+    MOD   shift, and go to state 93
+
+    $default  reduce using rule 51 (expression)
+
+
+State 125
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   52           | expression MINUS expression .
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    MULT  shift, and go to state 90
+    DIV   shift, and go to state 91
+    MOD   shift, and go to state 93
+
+    $default  reduce using rule 52 (expression)
+
+
+State 126
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   53           | expression MULT expression .
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    $default  reduce using rule 53 (expression)
+
+
+State 127
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   54           | expression DIV expression .
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    $default  reduce using rule 54 (expression)
+
+
+State 128
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   62           | expression AND expression .
+   63           | expression . OR expression
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    MOD         shift, and go to state 93
+
+    $default  reduce using rule 62 (expression)
+
+
+State 129
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   55           | expression MOD expression .
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+
+    $default  reduce using rule 55 (expression)
+
+
+State 130
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   63           | expression OR expression .
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    MOD         shift, and go to state 93
+
+    $default  reduce using rule 63 (expression)
+
+
+State 131
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    EOL  shift, and go to state 143
+
+
+State 132
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA . expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN declaration_subst_calc COMMA . expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 144
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 133
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA . expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN subst_calc COMMA . expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 145
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 134
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA . expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN subst_calc_2 COMMA . expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 146
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 135
+
+   38 identifiers: identifiers . COMMA IDENTIFIER
+   39            | identifiers . COMMA IDENTIFIER DOT INTLITERAL
+   40            | identifiers . COMMA IDENTIFIER DOT IDENTIFIER
+   44 subst_calc: identifiers . SUBST expression
+   45           | identifiers . SUBST STRINGLITERAL
+
+    SUBST  shift, and go to state 62
+    COMMA  shift, and go to state 68
+
+
+State 136
+
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 147
+
+
+State 137
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 148
+
+
+State 138
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   88 args: args . COMMA types IDENTIFIER
+
+    COMMA        shift, and go to state 149
+    RIGHT_PAREN  shift, and go to state 150
+
+
+State 139
+
+   89 args: types . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 151
+
+
+State 140
+
+   39 identifiers: identifiers COMMA IDENTIFIER DOT . INTLITERAL
+   40            | identifiers COMMA IDENTIFIER DOT . IDENTIFIER
+
+    INTLITERAL  shift, and go to state 152
+    IDENTIFIER  shift, and go to state 153
+
+
+State 141
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 154
+
+
+State 142
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+   88 args: args . COMMA types IDENTIFIER
+
+    COMMA        shift, and go to state 149
+    RIGHT_PAREN  shift, and go to state 155
+
+
+State 143
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    LEFT_BRACE  shift, and go to state 156
+
+
+State 144
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression . COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN declaration_subst_calc COMMA expression . COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+    COMMA       shift, and go to state 157
+
+
+State 145
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression . COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN subst_calc COMMA expression . COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+    COMMA       shift, and go to state 158
+
+
+State 146
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression . COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN subst_calc_2 COMMA expression . COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EQUAL       shift, and go to state 82
+    NOT_EQUAL   shift, and go to state 83
+    MORE_EQUAL  shift, and go to state 84
+    LESS_EQUAL  shift, and go to state 85
+    MORE        shift, and go to state 86
+    LESS        shift, and go to state 87
+    PLUS        shift, and go to state 88
+    MINUS       shift, and go to state 89
+    MULT        shift, and go to state 90
+    DIV         shift, and go to state 91
+    AND         shift, and go to state 92
+    MOD         shift, and go to state 93
+    OR          shift, and go to state 94
+    COMMA       shift, and go to state 159
+
+
+State 147
+
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 160
+
+
+State 148
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    LEFT_BRACE  shift, and go to state 161
+
+
+State 149
+
+   88 args: args COMMA . types IDENTIFIER
+
+    INT     shift, and go to state 10
+    DOUBLE  shift, and go to state 11
+    STRING  shift, and go to state 12
+
+    types  go to state 162
+
+
+State 150
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 163
+
+
+State 151
+
+   89 args: types IDENTIFIER .
+
+    $default  reduce using rule 89 (args)
+
+
+State 152
+
+   39 identifiers: identifiers COMMA IDENTIFIER DOT INTLITERAL .
+
+    $default  reduce using rule 39 (identifiers)
+
+
+State 153
+
+   40 identifiers: identifiers COMMA IDENTIFIER DOT IDENTIFIER .
+
+    $default  reduce using rule 40 (identifiers)
+
+
+State 154
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    LEFT_BRACE  shift, and go to state 164
+
+
+State 155
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 165
+
+
+State 156
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    EOL  shift, and go to state 166
+
+
+State 157
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA . subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   81         | FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA . subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers   go to state 27
+    subst_calc    go to state 167
+    subst_calc_2  go to state 168
+
+
+State 158
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA . subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   83         | FOR LEFT_PAREN subst_calc COMMA expression COMMA . subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers   go to state 27
+    subst_calc    go to state 169
+    subst_calc_2  go to state 170
+
+
+State 159
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA . subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+   85         | FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA . subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 46
+
+    identifiers   go to state 27
+    subst_calc    go to state 171
+    subst_calc_2  go to state 172
+
+
+State 160
+
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 173
+
+
+State 161
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 174
+
+
+State 162
+
+   88 args: args COMMA types . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 175
+
+
+State 163
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    LEFT_BRACE  shift, and go to state 176
+
+
+State 164
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 177
+
+
+State 165
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE eols
+
+    LEFT_BRACE  shift, and go to state 178
+
+
+State 166
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 179
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 167
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 180
+
+
+State 168
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 181
+
+
+State 169
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 182
+
+
+State 170
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 183
+
+
+State 171
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 184
+
+
+State 172
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 . RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 185
+
+
+State 173
+
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 186
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 174
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE eols
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 187
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 175
+
+   88 args: args COMMA types IDENTIFIER .
+
+    $default  reduce using rule 88 (args)
+
+
+State 176
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 188
+
+
+State 177
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE eols
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 189
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 178
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE eols
+
+    EOL  shift, and go to state 190
+
+
+State 179
+
+   12 elements: elements . element
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACKET
+   74        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    IDENTIFIER     shift, and go to state 1
+    RETURN         shift, and go to state 2
+    INPUT          shift, and go to state 3
+    OUTPUT         shift, and go to state 4
+    IF             shift, and go to state 5
+    FOR            shift, and go to state 6
+    WHILE          shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    RIGHT_BRACE    shift, and go to state 191
+    RIGHT_BRACKET  shift, and go to state 192
+    INT            shift, and go to state 10
+    DOUBLE         shift, and go to state 11
+    STRING         shift, and go to state 12
+    SEMICOLON      shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 180
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 193
+
+
+State 181
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 194
+
+
+State 182
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 195
+
+
+State 183
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 196
+
+
+State 184
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 197
+
+
+State 185
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN . EOL LEFT_BRACE EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 198
+
+
+State 186
+
+   12 elements: elements . element
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 199
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 187
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE eols
+   12 elements: elements . element
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 200
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 188
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE eols
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 201
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 189
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE eols
+   12 elements: elements . element
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 202
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 190
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE eols
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 203
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 191
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . EOL else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    EOL  shift, and go to state 204
+
+
+State 192
+
+   73 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET .
+
+    $default  reduce using rule 73 (if_stmt)
+
+
+State 193
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 205
+
+
+State 194
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 206
+
+
+State 195
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 207
+
+
+State 196
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 208
+
+
+State 197
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 209
+
+
+State 198
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL . LEFT_BRACE EOL elements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 210
+
+
+State 199
+
+   21 element_content: WHILE LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 21 (element_content)
+
+
+State 200
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . eols
+
+    EOL  shift, and go to state 15
+
+    eols  go to state 211
+
+
+State 201
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE eols
+   12 elements: elements . element
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 212
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 202
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . eols
+
+    EOL  shift, and go to state 15
+
+    eols  go to state 213
+
+
+State 203
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE eols
+   12 elements: elements . element
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 214
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 204
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL . ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   75        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL . else_if_stmts RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL . else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    ELSE  shift, and go to state 215
+
+    else_if_stmts  go to state 216
+    else_if_stmt   go to state 217
+
+
+State 205
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 218
+
+
+State 206
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 219
+
+
+State 207
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 220
+
+
+State 208
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 221
+
+
+State 209
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 222
+
+
+State 210
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE . EOL elements RIGHT_BRACE
+
+    EOL  shift, and go to state 223
+
+
+State 211
+
+   11 func_block: VOID IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols .
+   93 eols: eols . EOL
+
+    EOL  shift, and go to state 72
+
+    $default  reduce using rule 11 (func_block)
+
+
+State 212
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . eols
+
+    EOL  shift, and go to state 15
+
+    eols  go to state 224
+
+
+State 213
+
+    9 func_block: types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols .
+   93 eols: eols . EOL
+
+    EOL  shift, and go to state 72
+
+    $default  reduce using rule 9 (func_block)
+
+
+State 214
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE . eols
+
+    EOL  shift, and go to state 15
+
+    eols  go to state 225
+
+
+State 215
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE . EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   79 else_if_stmt: ELSE . IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+    IF   shift, and go to state 226
+    EOL  shift, and go to state 227
+
+
+State 216
+
+   75 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts . RIGHT_BRACKET
+   76        | IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts . RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   77 else_if_stmts: else_if_stmts . RIGHT_BRACE EOL else_if_stmt
+
+    RIGHT_BRACE    shift, and go to state 228
+    RIGHT_BRACKET  shift, and go to state 229
+
+
+State 217
+
+   78 else_if_stmts: else_if_stmt .
+
+    $default  reduce using rule 78 (else_if_stmts)
+
+
+State 218
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 230
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 219
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 231
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 220
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 232
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 221
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 233
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 222
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 234
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 223
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL . elements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 235
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 224
+
+   10 func_block: VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols .
+   93 eols: eols . EOL
+
+    EOL  shift, and go to state 72
+
+    $default  reduce using rule 10 (func_block)
+
+
+State 225
+
+    8 func_block: types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols .
+   93 eols: eols . EOL
+
+    EOL  shift, and go to state 72
+
+    $default  reduce using rule 8 (func_block)
+
+
+State 226
+
+   79 else_if_stmt: ELSE IF . LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+    LEFT_PAREN  shift, and go to state 236
+
+
+State 227
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL . LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    LEFT_BRACE  shift, and go to state 237
+
+
+State 228
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE . EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   77 else_if_stmts: else_if_stmts RIGHT_BRACE . EOL else_if_stmt
+
+    EOL  shift, and go to state 238
+
+
+State 229
+
+   75 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET .
+
+    $default  reduce using rule 75 (if_stmt)
+
+
+State 230
+
+   12 elements: elements . element
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 239
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 231
+
+   12 elements: elements . element
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 240
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 232
+
+   12 elements: elements . element
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 241
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 233
+
+   12 elements: elements . element
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 242
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 234
+
+   12 elements: elements . element
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 243
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 235
+
+   12 elements: elements . element
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 1
+    RETURN       shift, and go to state 2
+    INPUT        shift, and go to state 3
+    OUTPUT       shift, and go to state 4
+    IF           shift, and go to state 5
+    FOR          shift, and go to state 6
+    WHILE        shift, and go to state 7
+    BREAK        shift, and go to state 8
+    CONTINUE     shift, and go to state 9
+    RIGHT_BRACE  shift, and go to state 244
+    INT          shift, and go to state 10
+    DOUBLE       shift, and go to state 11
+    STRING       shift, and go to state 12
+    SEMICOLON    shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 236
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN . expression RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+    INTLITERAL     shift, and go to state 37
+    DOUBLELITERAL  shift, and go to state 38
+    IDENTIFIER     shift, and go to state 40
+    MINUS          shift, and go to state 41
+    LEFT_PAREN     shift, and go to state 42
+
+    expression  go to state 245
+    monomial    go to state 44
+    func_exe    go to state 45
+
+
+State 237
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE . EOL elements RIGHT_BRACKET
+
+    EOL  shift, and go to state 246
+
+
+State 238
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL . ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   77 else_if_stmts: else_if_stmts RIGHT_BRACE EOL . else_if_stmt
+
+    ELSE  shift, and go to state 247
+
+    else_if_stmt  go to state 248
+
+
+State 239
+
+   80 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 80 (for_stmt)
+
+
+State 240
+
+   81 for_stmt: FOR LEFT_PAREN declaration_subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 81 (for_stmt)
+
+
+State 241
+
+   82 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 82 (for_stmt)
+
+
+State 242
+
+   83 for_stmt: FOR LEFT_PAREN subst_calc COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 83 (for_stmt)
+
+
+State 243
+
+   84 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 84 (for_stmt)
+
+
+State 244
+
+   85 for_stmt: FOR LEFT_PAREN subst_calc_2 COMMA expression COMMA subst_calc_2 RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE .
+
+    $default  reduce using rule 85 (for_stmt)
+
+
+State 245
+
+   51 expression: expression . PLUS expression
+   52           | expression . MINUS expression
+   53           | expression . MULT expression
+   54           | expression . DIV expression
+   55           | expression . MOD expression
+   56           | expression . EQUAL expression
+   57           | expression . NOT_EQUAL expression
+   58           | expression . MORE_EQUAL expression
+   59           | expression . LESS_EQUAL expression
+   60           | expression . MORE expression
+   61           | expression . LESS expression
+   62           | expression . AND expression
+   63           | expression . OR expression
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression . RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+    EQUAL        shift, and go to state 82
+    NOT_EQUAL    shift, and go to state 83
+    MORE_EQUAL   shift, and go to state 84
+    LESS_EQUAL   shift, and go to state 85
+    MORE         shift, and go to state 86
+    LESS         shift, and go to state 87
+    PLUS         shift, and go to state 88
+    MINUS        shift, and go to state 89
+    MULT         shift, and go to state 90
+    DIV          shift, and go to state 91
+    AND          shift, and go to state 92
+    MOD          shift, and go to state 93
+    OR           shift, and go to state 94
+    RIGHT_PAREN  shift, and go to state 249
+
+
+State 246
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL . elements RIGHT_BRACKET
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 250
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 247
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE . EOL LEFT_BRACE EOL elements RIGHT_BRACKET
+   79 else_if_stmt: ELSE . IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements
+
+    IF   shift, and go to state 226
+    EOL  shift, and go to state 251
+
+
+State 248
+
+   77 else_if_stmts: else_if_stmts RIGHT_BRACE EOL else_if_stmt .
+
+    $default  reduce using rule 77 (else_if_stmts)
+
+
+State 249
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN . EOL LEFT_BRACE EOL elements
+
+    EOL  shift, and go to state 252
+
+
+State 250
+
+   12 elements: elements . element
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements . RIGHT_BRACKET
+
+    IDENTIFIER     shift, and go to state 1
+    RETURN         shift, and go to state 2
+    INPUT          shift, and go to state 3
+    OUTPUT         shift, and go to state 4
+    IF             shift, and go to state 5
+    FOR            shift, and go to state 6
+    WHILE          shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    RIGHT_BRACKET  shift, and go to state 253
+    INT            shift, and go to state 10
+    DOUBLE         shift, and go to state 11
+    STRING         shift, and go to state 12
+    SEMICOLON      shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 251
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL . LEFT_BRACE EOL elements RIGHT_BRACKET
+
+    LEFT_BRACE  shift, and go to state 254
+
+
+State 252
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL . LEFT_BRACE EOL elements
+
+    LEFT_BRACE  shift, and go to state 255
+
+
+State 253
+
+   74 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET .
+
+    $default  reduce using rule 74 (if_stmt)
+
+
+State 254
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE . EOL elements RIGHT_BRACKET
+
+    EOL  shift, and go to state 256
+
+
+State 255
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE . EOL elements
+
+    EOL  shift, and go to state 257
+
+
+State 256
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL . elements RIGHT_BRACKET
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 258
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 257
+
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL . elements
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    elements                go to state 259
+    element                 go to state 21
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 258
+
+   12 elements: elements . element
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements . RIGHT_BRACKET
+
+    IDENTIFIER     shift, and go to state 1
+    RETURN         shift, and go to state 2
+    INPUT          shift, and go to state 3
+    OUTPUT         shift, and go to state 4
+    IF             shift, and go to state 5
+    FOR            shift, and go to state 6
+    WHILE          shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    RIGHT_BRACKET  shift, and go to state 260
+    INT            shift, and go to state 10
+    DOUBLE         shift, and go to state 11
+    STRING         shift, and go to state 12
+    SEMICOLON      shift, and go to state 14
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 259
+
+   12 elements: elements . element
+   79 else_if_stmt: ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements .
+
+    IDENTIFIER  shift, and go to state 1
+    RETURN      shift, and go to state 2
+    INPUT       shift, and go to state 3
+    OUTPUT      shift, and go to state 4
+    IF          shift, and go to state 5
+    FOR         shift, and go to state 6
+    WHILE       shift, and go to state 7
+    BREAK       shift, and go to state 8
+    CONTINUE    shift, and go to state 9
+    INT         shift, and go to state 10
+    DOUBLE      shift, and go to state 11
+    STRING      shift, and go to state 12
+    SEMICOLON   shift, and go to state 14
+
+    $default  reduce using rule 79 (else_if_stmt)
+
+    element                 go to state 57
+    element_content         go to state 22
+    declaration             go to state 23
+    declaration_subst_calc  go to state 24
+    input_output            go to state 25
+    outputs                 go to state 26
+    identifiers             go to state 27
+    subst_calc              go to state 28
+    subst_calc_2            go to state 29
+    if_stmt                 go to state 30
+    for_stmt                go to state 31
+    func_exe                go to state 32
+    types                   go to state 58
+
+
+State 260
+
+   76 if_stmt: IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET .
+
+    $default  reduce using rule 76 (if_stmt)

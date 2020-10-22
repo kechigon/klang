@@ -7,6 +7,7 @@
 
 void register_printInt(llvm::Module *module);
 void register_printStr(llvm::Module *module);
+void register_printDouble(llvm::Module *module);
 void register_printNewLine(llvm::Module *module);
 void register_scanInt(llvm::Module *module);
 void register_scanDouble(llvm::Module *module);
@@ -30,6 +31,7 @@ void CodeGen::Make() {
 
   register_printInt(M.get());
   register_printStr(M.get());
+  register_printDouble(M.get());
   register_printNewLine(M.get());
   register_scanInt(M.get());
   register_scanDouble(M.get());
@@ -74,6 +76,13 @@ void CodeGen::register_printStr(llvm::Module *module) {
   context->AddFunc("printStr", func);
 }
 
+void CodeGen::register_printDouble(llvm::Module *module) {
+  std::vector<llvm::Type *> param_types(1, llvm::Type::getDoubleTy(module->getContext()));
+  llvm::FunctionType* printDouble_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), param_types, false);
+  llvm::Function *func = llvm::Function::Create(printDouble_type, llvm::Function::ExternalLinkage, "printDouble", module);
+  context->AddFunc("printDouble", func);
+}
+
 void CodeGen::register_printNewLine(llvm::Module *module) {
   llvm::FunctionType* printNewLine_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), false);
   llvm::Function *func = llvm::Function::Create(printNewLine_type, llvm::Function::ExternalLinkage, "printNewLine", module);
@@ -88,7 +97,7 @@ void CodeGen::register_scanInt(llvm::Module *module) {
 }
 
 void CodeGen::register_scanDouble(llvm::Module *module) {
-  std::vector<llvm::Type *> param_types(1, llvm::Type::getDoubleTy(module->getContext()));
+  std::vector<llvm::Type *> param_types(1, llvm::Type::getDoublePtrTy(module->getContext()));
   llvm::FunctionType* scanDouble_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), param_types, false);
   llvm::Function *func = llvm::Function::Create(scanDouble_type, llvm::Function::ExternalLinkage, "scanDouble", module);
   context->AddFunc("scanDouble", func);
