@@ -1,8 +1,8 @@
 CFLAG = -I /usr/include/llvm-6.0 -I /usr/include/llvm-c-6.0 -I ../srcs/ast -I ../ast -I ../srcs/codegen `llvm-config --cxxflags --ldflags --libs`
-NODES = ../srcs/ast/Node.cpp ../srcs/ast/IntNode.cpp ../srcs/ast/StringNode.cpp ../srcs/ast/DoubleNode.cpp ../srcs/ast/ArrayElementNode.cpp
+NODES = ../srcs/ast/Node.cpp ../srcs/ast/StringNode.cpp ../srcs/ast/DoubleNode.cpp ../srcs/ast/ArrayElementNode.cpp
 
-klang: lex.yy.c parser.tab.c parser.tab.h main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o
-	g++ main.o Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o parser.tab.c lex.yy.c ${CFLAG} -o klang
+klang: lex.yy.c parser.tab.c parser.tab.h main.o Node.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o
+	g++ main.o Node.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o parser.tab.c lex.yy.c ${CFLAG} -o klang
 	cp klang ../bin
 
 main.o: ../srcs/main.cpp
@@ -14,7 +14,7 @@ parser.tab.c parser.tab.h: ../srcs/parser/parser.y
 lex.yy.c: ../srcs/parser/lexer.l parser.tab.h
 	flex ../srcs/parser/lexer.l
 
-Node.o IntNode.o StringNode.o DoubleNode.o ArrayElementNode.o: ${NODES}
+Node.o StringNode.o DoubleNode.o ArrayElementNode.o: ${NODES}
 	g++ -c ${CFLAG} ${NODES}
 
 showAST.o: ../srcs/ast/showAST.cpp
@@ -39,7 +39,7 @@ error.o: ../srcs/error.cpp
 	g++ -c ${CFLAG} ../srcs/error.cpp
 
 clean:
-	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o *.ll a.txt klang
+	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o *.ll  *.out a.txt klang
 
 re: clean klang
 

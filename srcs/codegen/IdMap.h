@@ -20,7 +20,7 @@
 #include "llvm/IR/PassManager.h"
 
 enum idType {
-    int_type, double_type, string_type
+    double_type, string_type
 };
 
 struct id {

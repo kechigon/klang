@@ -79,10 +79,6 @@ bool Node::isNode() {
     return getType() == node_t;
 }
 
-bool Node::isIntNode() {
-    return getType() == int_node_t;
-}
-
 bool Node::isDoubleNode() {
     return getType() == double_node_t;
 }
@@ -98,7 +94,6 @@ bool Node::isArrayElementNode() {
 std::string Node::getTypeName() {
     switch (getType()) {
         case node_t: return "Node";
-        case int_node_t: return "IntNode";
         case string_node_t: return "StringNode";
         case double_node_t: return "doubleNode";
         case arr_ele_node_t: return "ArrEleNode";

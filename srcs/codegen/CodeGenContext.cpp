@@ -117,8 +117,6 @@ llvm::Type* CodeGenContext::getType(Node* node) {
 llvm::Type* CodeGenContext::getType(std::string str) {
 	if (str == "VOID") 
 		return llvm::Type::getVoidTy(*C);
-	if (str == "INT") 
-		return llvm::Type::getInt32Ty(*C);
 	if (str == "STRING") 
 		return llvm::Type::getInt8PtrTy(*C);
 	if (str == "DOUBLE") 

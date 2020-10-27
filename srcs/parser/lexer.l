@@ -8,8 +8,7 @@
 %option nounput
 %option noinput
 WHITESPACE      [ \t]
-INTLITERAL      [0-9]+
-DOUBLELITERAL   {INTLITERAL}\.[0-9]+
+DOUBLELITERAL   ([0-9]+)|([0-9]+\.[0-9]+)
 STRINGLITERAL   \"[^"]*\"|\'[^']*\'
 COMMENT         "/*"([^\*]|(\*)*[^\*/])*(\*)*"*/"
 IDENTIFIER      [a-zA-Z_][0-9a-zA-Z_]*
@@ -49,7 +48,6 @@ RIGHT_PAREN     \)
 LEFT_BRACE      \{
 RIGHT_BRACE     \}
 RIGHT_BRACKET   \]
-INT             int
 DOUBLE          double
 STRING          string
 VOID            void
@@ -62,11 +60,6 @@ EOL             \n|\r\n
 }
 
 {WHITESPACE} ;
-
-{INTLITERAL} {
-  yylval.ival = atoi(yytext);
-  return INTLITERAL;
-}
 
 {DOUBLELITERAL} {
   yylval.dval = atof(yytext); 
@@ -218,10 +211,6 @@ EOL             \n|\r\n
 
 {RIGHT_BRACKET} {
   return RIGHT_BRACKET;
-}
-
-{INT} {
-  return INT;
 }
 
 {DOUBLE} {

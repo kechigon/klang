@@ -1,8 +1,8 @@
 #include "ArrayElementNode.h"
 
-ArrayElementNode::ArrayElementNode(const char* _value, int n){
+ArrayElementNode::ArrayElementNode(const char* _value, double n){
   value1 = _value;
-  num = n;
+  num = (int)n;
   type = 1;
 }
 
@@ -12,7 +12,7 @@ ArrayElementNode::ArrayElementNode(const char* _value1, const char* _value2){
   type = 0;
 }
 
-ArrayElementNode* ArrayElementNode::Create(const char* _value, int n) {
+ArrayElementNode* ArrayElementNode::Create(const char* _value, double n) {
 	return new ArrayElementNode(_value, n);
 }
 

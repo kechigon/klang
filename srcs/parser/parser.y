@@ -14,13 +14,11 @@
 %}
 
 %union {
-  int ival;
   double dval;
   char* sval;
   Node* nodes;
 }
 
-%token <ival> INTLITERAL
 %token <dval> DOUBLELITERAL
 %token <sval> STRINGLITERAL
 %token <sval> IDENTIFIER
@@ -60,7 +58,6 @@
        LEFT_BRACE
        RIGHT_BRACE
        RIGHT_BRACKET
-       INT
        DOUBLE
        STRING
        VOID
@@ -100,7 +97,7 @@
 %%
 program:
   blocks {
-    if(show_syntax) if(show_syntax) cout << "program" << endl;
+    if(show_syntax) cout << "program" << endl;
     program = $1;
   };
 
@@ -310,7 +307,7 @@ identifiers:
     $$ = $1; $$ -> addBrother(StringNode::Create($3));
   }
   |
-  identifiers COMMA IDENTIFIER DOT INTLITERAL {
+  identifiers COMMA IDENTIFIER DOT DOUBLELITERAL {
     if(show_syntax) cout << "identifiers mult array INT" << $3 << " " << $5 << endl;
     $$ = $1; $$ -> addBrother(ArrayElementNode::Create($3, $5));
   }
@@ -325,7 +322,7 @@ identifiers:
     $$ = StringNode::Create($1);
   }
   |
-  IDENTIFIER DOT INTLITERAL {
+  IDENTIFIER DOT DOUBLELITERAL {
     if(show_syntax) cout << "identifiers one array INT " << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
   }
@@ -456,11 +453,6 @@ expression:
   };
 
 monomial:
-  INTLITERAL {
-    if(show_syntax) cout << "monomial " << $1 << endl;
-    $$ = IntNode::Create($1);
-  }
-  |
   DOUBLELITERAL {
     if(show_syntax) cout << "monomial " << $1 << endl;
     $$ = DoubleNode::Create($1);
@@ -471,7 +463,7 @@ monomial:
     $$ = StringNode::Create($1);
   }
   |
-  IDENTIFIER DOT INTLITERAL {
+  IDENTIFIER DOT DOUBLELITERAL {
     if(show_syntax) cout << "monomial " << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
   }
@@ -578,11 +570,6 @@ args:
   };
 
 types:
-  INT {
-    if(show_syntax) cout << "types INT" << endl;
-    $$ = StringNode::Create("INT");
-  }
-  |
   DOUBLE {
     if(show_syntax) cout << "types DOUBLE" << endl;
     $$ = StringNode::Create("DOUBLE");

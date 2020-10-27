@@ -4,7 +4,7 @@
 
 enum NodeType
 {
-    node_t = 0, int_node_t, double_node_t, string_node_t, arr_ele_node_t
+    node_t, double_node_t, string_node_t, arr_ele_node_t
 };
 
 class Node
@@ -29,7 +29,6 @@ public:
     std::string getTypeName();
     virtual NodeType getType();
     bool isNode();
-    bool isIntNode();
     bool isDoubleNode();
     bool isStringNode();
     bool isArrayElementNode();

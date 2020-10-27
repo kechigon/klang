@@ -11,12 +11,31 @@ static llvm::Value* EXR_macro(CodeGenContext* context, Node* node) {
 		node->check();
 		return EXR_macro(context, node->getChild());
 	}
-	/*else if(node->isStringNode()) {
-
-	}*/
-	else if(node->isIntNode()) {
-		node->check();
-		return builder.getInt32(((IntNode*)node)->getint());
+	else if(node->isStringNode()) {
+		if(((StringNode*)node)->getStr() == "PULS") {
+			node->check();
+			llvm::Value *lhs = EXR_macro(context, node->getNext());
+			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
+			return builder.CreateFAdd(lhs, rhs);
+		}
+		else if(((StringNode*)node)->getStr() == "MINUS") {
+			node->check();
+			llvm::Value *lhs = EXR_macro(context, node->getNext());
+			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
+			return builder.CreateFSub(lhs, rhs);
+		}
+		else if(((StringNode*)node)->getStr() == "MULT") {
+			node->check();
+			llvm::Value *lhs = EXR_macro(context, node->getNext());
+			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
+			return builder.CreateFMul(lhs, rhs);
+		}
+		else if(((StringNode*)node)->getStr() == "DIV") {
+			node->check();
+			llvm::Value *lhs = EXR_macro(context, node->getNext());
+			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
+			return builder.CreateFDiv(lhs, rhs);
+		}
 	}
 	else if(node->isDoubleNode()) {
 		node->check();
@@ -34,8 +53,7 @@ static llvm::Value* DECL_macro(CodeGenContext* context, Node* node) {
 		node->check();
 		node->getNext()->check();
   	llvm::AllocaInst *alloc = builder.CreateAlloca(type, nullptr, ((StringNode*)(node->getNext()))->getStr().c_str());
-		if(((StringNode*)node)->getStr() == "INT") context->st->insert(((StringNode*)(node->getNext()))->getStr(), int_type, (llvm::Value*)alloc);
-		else if(((StringNode*)node)->getStr() == "DOUBLE") context->st->insert(((StringNode*)(node->getNext()))->getStr(), double_type, (llvm::Value*)alloc);
+		if(((StringNode*)node)->getStr() == "DOUBLE") context->st->insert(((StringNode*)(node->getNext()))->getStr(), double_type, (llvm::Value*)alloc);
 		else if(((StringNode*)node)->getStr() == "STRING") context->st->insert(((StringNode*)(node->getNext()))->getStr(), string_type, (llvm::Value*)alloc);
 		return alloc;
 	}
@@ -78,8 +96,7 @@ static llvm::Value* OUTPUT_macro(CodeGenContext* context, Node* node) {
 	else {
 			llvm::Value *ans = EXR_macro(context, node);
 			llvm::Type *t = ans->getType();
-			if(t->isIntegerTy()) return builder.CreateCall(context->FindFunc("printInt"), std::vector<llvm::Value *>(1, ans));
-			else if(t->isDoubleTy()) return builder.CreateCall(context->FindFunc("printDouble"), std::vector<llvm::Value *>(1, ans));
+			if(t->isDoubleTy()) return builder.CreateCall(context->FindFunc("printDouble"), std::vector<llvm::Value *>(1, ans));
 			else if(t->isPointerTy()) return builder.CreateCall(context->FindFunc("printStr"), std::vector<llvm::Value *>(1, ans));
 			return NULL;
 	}
@@ -99,8 +116,7 @@ static llvm::Value* INPUT_macro(CodeGenContext* context, Node* node) {
    id *id = context->FindST(node);
 	if(id != NULL) {
 		node->check();
-		if(id->type == int_type) return builder.CreateCall(context->FindFunc("scanInt"), std::vector<llvm::Value *>(1, id->data));
-		else if(id->type == double_type) return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id->data));
+		if(id->type == double_type) return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id->data));
 		//else if(id->type == string_type) return builder.CreateCall(context->FindFunc("scanStr"), std::vector<llvm::Value *>(1, id->data));
 		else return NULL;
 	}

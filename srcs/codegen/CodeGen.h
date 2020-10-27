@@ -12,11 +12,9 @@ public:
 	~CodeGen();
 	
 	void Make();
-	void register_printInt(llvm::Module *module);
 	void register_printStr(llvm::Module *module);
 	void register_printDouble(llvm::Module *module);
 	void register_printNewLine(llvm::Module *module);
-	void register_scanInt(llvm::Module *module);
 	void register_scanDouble(llvm::Module *module);
 	void register_scanStr(llvm::Module *module);
 

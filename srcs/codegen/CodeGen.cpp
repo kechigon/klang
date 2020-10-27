@@ -5,11 +5,9 @@
 #include <vector>
 #include <iostream>
 
-void register_printInt(llvm::Module *module);
 void register_printStr(llvm::Module *module);
 void register_printDouble(llvm::Module *module);
 void register_printNewLine(llvm::Module *module);
-void register_scanInt(llvm::Module *module);
 void register_scanDouble(llvm::Module *module);
 //void register_scanStr(llvm::Module *module);
 extern bool show_module;
@@ -30,11 +28,9 @@ void CodeGen::Make() {
   context->setModule(M.get());
   context->setIRBuilder(&builder);
 
-  register_printInt(M.get());
   register_printStr(M.get());
   register_printDouble(M.get());
   register_printNewLine(M.get());
-  register_scanInt(M.get());
   register_scanDouble(M.get());
   //register_scanStr(M.get());
 
@@ -65,13 +61,6 @@ void CodeGen::Make() {
 	llvm::llvm_shutdown();
 }
 
-void CodeGen::register_printInt(llvm::Module *module) {
-  std::vector<llvm::Type *> param_types(1, llvm::Type::getInt32Ty(module->getContext()));
-  llvm::FunctionType* printInt_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), param_types, false);
-  llvm::Function *func = llvm::Function::Create(printInt_type, llvm::Function::ExternalLinkage, "printInt", module);
-  context->AddFunc("printInt", func);
-}
-
 void CodeGen::register_printStr(llvm::Module *module) {
   std::vector<llvm::Type *> param_types(1, llvm::Type::getInt8PtrTy(module->getContext()));
   llvm::FunctionType* printStr_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), param_types, false);
@@ -90,13 +79,6 @@ void CodeGen::register_printNewLine(llvm::Module *module) {
   llvm::FunctionType* printNewLine_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), false);
   llvm::Function *func = llvm::Function::Create(printNewLine_type, llvm::Function::ExternalLinkage, "printNewLine", module);
   context->AddFunc("printNewLine", func);
-}
-
-void CodeGen::register_scanInt(llvm::Module *module) {
-  std::vector<llvm::Type *> param_types(1, llvm::Type::getInt32PtrTy(module->getContext()));
-  llvm::FunctionType* scanInt_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(module->getContext()), param_types, false);
-  llvm::Function *func = llvm::Function::Create(scanInt_type, llvm::Function::ExternalLinkage, "scanInt", module);
-  context->AddFunc("scanInt", func);
 }
 
 void CodeGen::register_scanDouble(llvm::Module *module) {
