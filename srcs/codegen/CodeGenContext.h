@@ -25,68 +25,70 @@
 #include "llvm/IR/PassManager.h"
 
 class CodeGenContext;
-typedef llvm::Value* (*CodeGenFunction)(CodeGenContext*, Node*);
+typedef llvm::Value *(*CodeGenFunction)(CodeGenContext *, Node *);
 typedef struct _funcReg
 {
-	const char*     name;
+	const char *name;
 	CodeGenFunction func;
 } FuncReg;
 
 class CodeGenContext
 {
 public:
-	CodeGenContext(Node* node);
+	CodeGenContext(Node *node);
 	~CodeGenContext();
 
-	void MakeBegin() { 
-		MakeMacro(root); 
+	void MakeBegin()
+	{
+		MakeMacro(root);
 	}
 
-	void MakeMacro(Node* node);
+	void MakeMacro(Node *node);
 	CodeGenFunction getMacro(std::string str);
 
-	void AddMacros(const FuncReg* macro_funcs);
+	void AddMacros(const FuncReg *macro_funcs);
 
-	llvm::BasicBlock* createBlock();
-	llvm::BasicBlock* createBlock(llvm::Function* f);
+	llvm::BasicBlock *createBlock();
+	llvm::BasicBlock *createBlock(llvm::Function *f);
 
-	void setnowFunc(llvm::Function* f);
-	void setnowBlock(llvm::BasicBlock* b);
-	llvm::Function* getnowFunc();
-	llvm::BasicBlock* getnowBlock();
-	llvm::IRBuilder<>* getBuilder();
-	llvm::Module* getModule(){return M;};
-	llvm::LLVMContext* getContext(){return C;};
+	void setnowFunc(llvm::Function *f);
+	void setnowBlock(llvm::BasicBlock *b);
+	llvm::Function *getnowFunc();
+	llvm::BasicBlock *getnowBlock();
+	llvm::IRBuilder<> *getBuilder();
+	llvm::Module *getModule() { return M; };
+	llvm::LLVMContext *getContext() { return C; };
 
-	llvm::Type* getType(Node*);
-	llvm::Type* getType(std::string str);
+	llvm::Type *getType(Node *);
+	llvm::Type *getType(std::string str);
 
-	void setContext(llvm::LLVMContext* Context);
-	void setModule(llvm::Module* Module);
-	void setIRBuilder(llvm::IRBuilder<>* IRBuilder);
+	void setContext(llvm::LLVMContext *Context);
+	void setModule(llvm::Module *Module);
+	void setIRBuilder(llvm::IRBuilder<> *IRBuilder);
 
-	id* FindST(Node* node) const;
-	id* FindST(std::string str) const {
+	id *FindST(Node *node) const;
+	id *FindST(std::string str) const
+	{
 		return st->find(str);
 	}
 	void resetST();
-	IDTable* st;
+	IDTable *st;
 
 	void AddFunc(std::string name, llvm::Function *func);
-	llvm::Function* FindFunc(std::string name) const;
-private:
-	Node* root;
+	llvm::Function *FindFunc(std::string name) const;
 
-	llvm::LLVMContext* C;
-	llvm::Module* M;
-	llvm::IRBuilder<>* B;
-	llvm::Function* nowFunc;
-	llvm::BasicBlock* nowBlock;
-	
+private:
+	Node *root;
+
+	llvm::LLVMContext *C;
+	llvm::Module *M;
+	llvm::IRBuilder<> *B;
+	llvm::Function *nowFunc;
+	llvm::BasicBlock *nowBlock;
+
 	std::map<std::string, CodeGenFunction> macro_map;
 
-	std::map<std::string, llvm::Function*> func_map;
+	std::map<std::string, llvm::Function *> func_map;
 };
-
 
 #endif

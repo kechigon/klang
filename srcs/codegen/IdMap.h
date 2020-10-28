@@ -19,11 +19,14 @@
 #include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/IR/PassManager.h"
 
-enum idType {
-    double_type, string_type
+enum idType
+{
+    double_type,
+    string_type
 };
 
-struct id {
+struct id
+{
     idType type;
     llvm::Value *data;
 };
@@ -33,10 +36,11 @@ class IDMap
 public:
     IDMap();
     ~IDMap();
-    id* find(std::string str) const;
-    void insert(std::string str, idType t, llvm::Value* d);
+    id *find(std::string str) const;
+    void insert(std::string str, idType t, llvm::Value *d);
+
 private:
-   std::map<std::string, id*> ID_map;
+    std::map<std::string, id *> ID_map;
 };
 
 #endif

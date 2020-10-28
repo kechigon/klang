@@ -5,33 +5,41 @@ IDTable::IDTable()
     ID_stack.push_back(IDMap());
 }
 
-id* IDTable::find(std::string idname) const {
-    for (auto p = ID_stack.rbegin(); p != ID_stack.rend(); ++p) {
-        const IDMap& imap = *p;
-        id* pid = imap.find(idname);
-        if (pid != NULL) return pid;
+id *IDTable::find(std::string idname) const
+{
+    for (auto p = ID_stack.rbegin(); p != ID_stack.rend(); ++p)
+    {
+        const IDMap &imap = *p;
+        id *pid = imap.find(idname);
+        if (pid != NULL)
+            return pid;
     }
     return NULL;
 }
 
-void IDTable::insert(std::string str, idType t, llvm::Value* d) {
-    IDMap& imap = ID_stack.back();
+void IDTable::insert(std::string str, idType t, llvm::Value *d)
+{
+    IDMap &imap = ID_stack.back();
     imap.insert(str, t, d);
 }
 
-void IDTable::push() {
+void IDTable::push()
+{
     ID_stack.push_back(IDMap());
 }
 
-void IDTable::pop() {
+void IDTable::pop()
+{
     ID_stack.pop_back();
 }
 
-int IDTable::getLevel() {
-    return ID_stack.size()-1;
+int IDTable::getLevel()
+{
+    return ID_stack.size() - 1;
 }
 
-void IDTable::reset() {
+void IDTable::reset()
+{
     ID_stack.clear();
     ID_stack.push_back(IDMap());
 }

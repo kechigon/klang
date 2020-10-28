@@ -24,14 +24,12 @@ PLUS            \+
 MINUS           -
 MULT            \*
 DIV             \/
-MOD             %
 AND             &
 OR              \|
 ADD_SUBST       \+=
 SUBT_SUBST      -=
 MULT_SUBST      \*=
 DIV_SUBST       \/=
-MOD_SUBST       %=
 RETURN          return
 DOT             \.
 COMMA           ,
@@ -115,10 +113,6 @@ EOL             \n|\r\n
   return DIV;
 }
 
-{MOD} {
-  return MOD;
-}
-
 {AND} {
   return AND;
 }
@@ -141,10 +135,6 @@ EOL             \n|\r\n
 
 {DIV_SUBST} {
   return DIV_SUBST;
-}
-
-{MOD_SUBST} {
-  return MOD_SUBST;
 }
 
 {RETURN} {

@@ -8,12 +8,13 @@ class IDTable
 {
 public:
     IDTable();
-    id* find(std::string str) const;
-    void insert(std::string str, idType t, llvm::Value* d);
+    id *find(std::string str) const;
+    void insert(std::string str, idType t, llvm::Value *d);
     void push();
     void pop();
     int getLevel();
     void reset();
+
 private:
     std::deque<IDMap> ID_stack;
 };

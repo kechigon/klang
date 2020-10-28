@@ -8,9 +8,9 @@ class CodeGenContext;
 class CodeGen
 {
 public:
-	CodeGen(Node* node);
+	CodeGen(Node *node);
 	~CodeGen();
-	
+
 	void Make();
 	void register_printStr(llvm::Module *module);
 	void register_printDouble(llvm::Module *module);
@@ -19,7 +19,7 @@ public:
 	void register_scanStr(llvm::Module *module);
 
 private:
-	CodeGenContext* context;
+	CodeGenContext *context;
 };
 
 #endif

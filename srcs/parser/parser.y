@@ -35,13 +35,11 @@
        MULT
        DIV
        AND
-       MOD
        OR
        ADD_SUBST
        SUBT_SUBST
        MULT_SUBST
        DIV_SUBST
-       MOD_SUBST
        RETURN
        DOT
        COMMA
@@ -87,11 +85,11 @@
 %type <nodes> func_exe
 %type <nodes> args
 %type <nodes> types
-%right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST MOD_SUBST
+%right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST
 %left AND OR
 %left EQUAL NOT_EQUAL MORE_EQUAL LESS_EQUAL MORE LESS
 %left PLUS MINUS
-%left MULT DIV MOD
+%left MULT DIV 
 %left UMINUS
 
 %%
@@ -364,11 +362,6 @@ subst_calc_2:
   identifiers DIV_SUBST expression {
     if(show_syntax) cout << "subst_calc_2 DIV_SUBST" << endl;
     $$ = Node::make_list(3, StringNode::Create("DIV_SUBST"), $1, $3);
-  }
-  |
-  identifiers MOD_SUBST expression {
-    if(show_syntax) cout << "subst_calc_2 MOD_SUBST" << endl;
-    $$ = Node::make_list(3, StringNode::Create("MOD_SUBST"), $1, $3);
   };
 
 expression:
@@ -390,11 +383,6 @@ expression:
   expression DIV expression {
     if(show_syntax) cout << "expression DIV" << endl;
     $$ = Node::make_list(3, StringNode::Create("DIV"), $1, $3);
-  }
-  |
-  expression MOD expression {
-    if(show_syntax) cout << "expression MOD" << endl;
-    $$ = Node::make_list(3, StringNode::Create("MOD"), $1, $3);
   }
   |
   expression EQUAL expression {
