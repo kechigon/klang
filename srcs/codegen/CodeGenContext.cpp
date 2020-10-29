@@ -106,7 +106,7 @@ void CodeGenContext::setIRBuilder(llvm::IRBuilder<> *IRBuilder)
 	B = IRBuilder;
 }
 
-id *CodeGenContext::FindST(Node *node) const
+llvm::Value *CodeGenContext::FindST(Node *node) const
 {
 	if (node->isStringNode())
 	{

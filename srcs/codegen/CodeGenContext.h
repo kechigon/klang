@@ -66,8 +66,8 @@ public:
 	void setModule(llvm::Module *Module);
 	void setIRBuilder(llvm::IRBuilder<> *IRBuilder);
 
-	id *FindST(Node *node) const;
-	id *FindST(std::string str) const
+	llvm::Value *FindST(Node *node) const;
+	llvm::Value *FindST(std::string str) const
 	{
 		return st->find(str);
 	}

@@ -8,7 +8,7 @@ IDMap::~IDMap()
 {
 }
 
-id *IDMap::find(std::string str) const
+llvm::Value *IDMap::find(std::string str) const
 {
   auto p = ID_map.find(str);
   if (p != ID_map.end())
@@ -16,10 +16,7 @@ id *IDMap::find(std::string str) const
   return NULL;
 }
 
-void IDMap::insert(std::string str, idType t, llvm::Value *d)
+void IDMap::insert(std::string str, llvm::Value *d)
 {
-  id *i = new id();
-  i->type = t;
-  i->data = d;
-  ID_map[str] = i;
+  ID_map[str] = d;
 }

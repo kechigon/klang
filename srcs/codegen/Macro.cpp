@@ -122,15 +122,15 @@ static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 		else if (context->FindST(node) != NULL)
 		{
 			node->check();
-			llvm::Value *v = builder.CreateLoad(context->FindST(node)->data);
-			if (v->getType()->isPointerTy())
-			{
-				std::string idname = ((StringNode *)node)->getStr().c_str();
-				printError("You can't use strings in expressions("+idname+")");
-			}
+			llvm::Value *v = builder.CreateLoad(context->FindST(node));
 			return v;
 		}
-		return NULL;
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
 	}
 	else if (node->isDoubleNode())
 	{
@@ -144,23 +144,18 @@ static llvm::Value *DECL_macro(CodeGenContext *context, Node *node)
 {
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
-	llvm::Type *type = context->getType(node);
 
-	if (context->FindST(node->getNext()) == NULL)
+	if (context->FindST(node) == NULL)
 	{
 		node->check();
-		node->getNext()->check();
-		llvm::AllocaInst *alloc = builder.CreateAlloca(type, nullptr, ((StringNode *)(node->getNext()))->getStr().c_str());
-		if (((StringNode *)node)->getStr() == "DOUBLE")
-			context->st->insert(((StringNode *)(node->getNext()))->getStr(), double_type, (llvm::Value *)alloc);
-		else if (((StringNode *)node)->getStr() == "STRING")
-			context->st->insert(((StringNode *)(node->getNext()))->getStr(), string_type, (llvm::Value *)alloc);
+		llvm::AllocaInst *alloc = builder.CreateAlloca(llvm::Type::getDoubleTy(*(context->getContext())), nullptr);
+		context->st->insert(((StringNode *)node)->getStr(), (llvm::Value *)alloc);
 		return alloc;
 	}
 	else
 	{
 		std::string idname = ((StringNode *)(node->getNext()))->getStr().c_str();
-		printError("redefinition error("+idname+")");
+		printError("redefinition error(" + idname + ")");
 		return NULL;
 	}
 }
@@ -170,52 +165,115 @@ static llvm::Value *SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	id *id = context->FindST(node);
+	llvm::Value *id = context->FindST(node);
 	if (id != NULL)
 	{
 		node->check();
-		if (node->getNext()->isStringNode())
-		{
-			if (id->type != string_type) 
-			{
-				std::string idname = ((StringNode *)node)->getStr().c_str();
-				printError("Type of value to be assigned does not match("+idname+")");
-			}
-			node->getNext()->check();
-			llvm::StringRef sr(((StringNode *)(node->getNext()))->getStr());
-			llvm::Value *con = builder.CreateGlobalStringPtr(sr);
-			return builder.CreateStore(con, id->data);
-		}
-		else if (node->getNext()->isDoubleNode())
-		{
-			if (id->type != double_type)
-			{
-				std::string idname = ((StringNode *)node)->getStr().c_str();
-				printError("Type of value to be assigned does not match("+idname+")");
-			}
-			node->getNext()->check();
-			llvm::Value *con = llvm::ConstantFP::get(llvm::Type::getDoubleTy(*(context->getContext())), ((DoubleNode *)node->getNext())->getdouble());
-			return builder.CreateStore(con, id->data);
-		}
-		else if (node->getNext()->isNode())
-		{
-			if (id->type != double_type)
-			{
-				std::string idname = ((StringNode *)node)->getStr().c_str();
-				printError("Type of value to be assigned does not match("+idname+")");
-			}
-			llvm::Value *con = EXR_macro(context, node->getNext());
-			if (!con->getType()->isDoubleTy())
-				printError("Boolean value cannot be assigned to　double");
-			return builder.CreateStore(con, id->data);
-		}
-		else
-			return NULL;
+		llvm::Value *con = EXR_macro(context, node->getNext());
+		if (!con->getType()->isDoubleTy())
+			printError("Boolean value cannot be assigned to double");
+		return builder.CreateStore(con, id);
 	}
 	else
 	{
 		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared("+idname+")");
+		printError("The variable is not declared(" + idname + ")");
+		return NULL;
+	}
+}
+
+static llvm::Value *ADD_SUBST_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *id = context->FindST(node);
+	if (id != NULL)
+	{
+		node->check();
+		llvm::Value *exr = EXR_macro(context, node->getNext());
+		if (!exr->getType()->isDoubleTy())
+			printError("Boolean value cannot be assigned to double");
+		llvm::Value *data = builder.CreateLoad(id);
+		llvm::Value *add = builder.CreateFAdd(data, exr);
+		return builder.CreateStore(add, id);
+	}
+	else
+	{
+		std::string idname = ((StringNode *)node)->getStr().c_str();
+		printError("The variable is not declared(" + idname + ")");
+		return NULL;
+	}
+}
+
+static llvm::Value *SUBT_SUBST_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *id = context->FindST(node);
+	if (id != NULL)
+	{
+		node->check();
+		llvm::Value *exr = EXR_macro(context, node->getNext());
+		if (!exr->getType()->isDoubleTy())
+			printError("Boolean value cannot be assigned to double");
+		llvm::Value *data = builder.CreateLoad(id);
+		llvm::Value *add = builder.CreateFSub(data, exr);
+		return builder.CreateStore(add, id);
+	}
+	else
+	{
+		std::string idname = ((StringNode *)node)->getStr().c_str();
+		printError("The variable is not declared(" + idname + ")");
+		return NULL;
+	}
+}
+
+static llvm::Value *MULT_SUBST_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *id = context->FindST(node);
+	if (id != NULL)
+	{
+		node->check();
+		llvm::Value *exr = EXR_macro(context, node->getNext());
+		if (!exr->getType()->isDoubleTy())
+			printError("Boolean value cannot be assigned to double");
+		llvm::Value *data = builder.CreateLoad(id);
+		llvm::Value *add = builder.CreateFMul(data, exr);
+		return builder.CreateStore(add, id);
+	}
+	else
+	{
+		std::string idname = ((StringNode *)node)->getStr().c_str();
+		printError("The variable is not declared(" + idname + ")");
+		return NULL;
+	}
+}
+
+static llvm::Value *DIV_SUBST_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *id = context->FindST(node);
+	if (id != NULL)
+	{
+		node->check();
+		llvm::Value *exr = EXR_macro(context, node->getNext());
+		if (!exr->getType()->isDoubleTy())
+			printError("Boolean value cannot be assigned to double");
+		llvm::Value *data = builder.CreateLoad(id);
+		llvm::Value *add = builder.CreateFDiv(data, exr);
+		return builder.CreateStore(add, id);
+	}
+	else
+	{
+		std::string idname = ((StringNode *)node)->getStr().c_str();
+		printError("The variable is not declared(" + idname + ")");
 		return NULL;
 	}
 }
@@ -235,13 +293,11 @@ static llvm::Value *OUTPUT_macro(CodeGenContext *context, Node *node)
 	else
 	{
 		llvm::Value *ans = EXR_macro(context, node);
-		llvm::Type *t = ans->getType();
-		if (t->isDoubleTy())
-			return builder.CreateCall(context->FindFunc("printDouble"), std::vector<llvm::Value *>(1, ans));
-		else if (t->isPointerTy())
-			return builder.CreateCall(context->FindFunc("printStr"), std::vector<llvm::Value *>(1, ans));
-		return NULL;
+		if (!ans->getType()->isDoubleTy())
+			printError("Boolean value cannot be output");
+		return builder.CreateCall(context->FindFunc("printDouble"), std::vector<llvm::Value *>(1, ans));
 	}
+	return NULL;
 }
 
 static llvm::Value *NEWLINE_macro(CodeGenContext *context, Node *node)
@@ -257,20 +313,16 @@ static llvm::Value *INPUT_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	id *id = context->FindST(node);
+	llvm::Value *id = context->FindST(node);
 	if (id != NULL)
 	{
 		node->check();
-		if (id->type == double_type)
-			return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id->data));
-		//else if(id->type == string_type) return builder.CreateCall(context->FindFunc("scanStr"), std::vector<llvm::Value *>(1, id->data));
-		else
-			return NULL;
+		return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id));
 	}
 	else
 	{
 		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared("+idname+")");
+		printError("The variable is not declared(" + idname + ")");
 		return NULL;
 	}
 }
@@ -323,6 +375,10 @@ static llvm::Value *INPUT_macro(CodeGenContext *context, Node *node)
 extern const FuncReg macro_funcs[] = {
 		{"DECL", DECL_macro},
 		{"SUBST", SUBST_macro},
+		{"ADD_SUBST", ADD_SUBST_macro},
+		{"SUBT_SUBST", SUBT_SUBST_macro},
+		{"MULT_SUBST", MULT_SUBST_macro},
+		{"DIV_SUBST", DIV_SUBST_macro},
 		{"OUTPUT", OUTPUT_macro},
 		{"NEWLINE", NEWLINE_macro},
 		{"INPUT", INPUT_macro},

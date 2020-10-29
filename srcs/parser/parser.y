@@ -82,8 +82,6 @@
 %type <nodes> else_if_stmt
 %type <nodes> for_stmt
 %type <nodes> func_exe
-%type <nodes> args
-%type <nodes> types
 %right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST
 %left AND OR
 %left EQUAL NOT_EQUAL MORE_EQUAL LESS_EQUAL MORE LESS
@@ -131,17 +129,17 @@ func_blocks:
   };
 
 func_block:
-  types IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+   DOUBLE IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
     if(show_syntax) cout << "func_block eols" << endl;
-    $$ = Node::make_list(5, StringNode::Create("FUNC"), $1, StringNode::Create($2), $4, $9);
+    $$ = Node::make_list(5, StringNode::Create("FUNC"), StringNode::Create("DOUBLE"), StringNode::Create($2), $4, $9);
   }
   |
-  types IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+  DOUBLE IDENTIFIER LEFT_PAREN RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
     if(show_syntax) cout << "func_block no args eols" << endl;
-    $$ = Node::make_list(4, StringNode::Create("FUNC"), $1, StringNode::Create($2), $8);
+    $$ = Node::make_list(4, StringNode::Create("FUNC"), StringNode::Create("DOUBLE"), StringNode::Create($2), $8);
   }
   |
-  VOID IDENTIFIER LEFT_PAREN args RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
+  VOID IDENTIFIER LEFT_PAREN identifiers RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE eols {
     if(show_syntax) cout << "void func_block eols" << endl;
     $$ = Node::make_list(5, StringNode::Create("FUNC"), StringNode::Create("VOID"), StringNode::Create($2), $4, $9);
   }
@@ -235,9 +233,9 @@ element_content:
   };
 
 declaration:
-  types identifiers {
+  DOUBLE identifiers {
     if(show_syntax) cout << "declaration identifiers" << endl;
-    $$ = Node::make_list(3, StringNode::Create("DECL"), $1, $2);
+    $$ = Node::make_list(2, StringNode::Create("DECL"), $2);
   }
   |
   declaration_subst_calc {
@@ -246,9 +244,9 @@ declaration:
   };
 
 declaration_subst_calc:
-  types subst_calc {
+  DOUBLE subst_calc {
     if(show_syntax) cout << "declaration_subst_calc" << endl;
-    $$ = Node::make_list(3, StringNode::Create("DECL_SUBST"), $1, $2);
+    $$ = Node::make_list(2, StringNode::Create("DECL_SUBST"), $2);
   };
 
 input_output:
@@ -320,6 +318,12 @@ identifiers:
   IDENTIFIER DOT IDENTIFIER {
     if(show_syntax) cout << "identifiers one array IDENTIFIER" << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
+  };
+
+subst_calc:
+  identifiers SUBST expression {
+    if(show_syntax) cout << "sbstcalc SUBST" << endl;
+    $$ = Node::make_list(3, StringNode::Create("SUBST"), $1, $3);
   };
 
 subst_calc_2:
@@ -523,23 +527,6 @@ func_exe:
   IDENTIFIER LEFT_PAREN RIGHT_PAREN {
     if(show_syntax) cout << "func_exe no identifiers" << endl;
     $$ = Node::make_list(2, StringNode::Create("FUNC_EXE"), StringNode::Create($1));
-  };
-
-args:
-  args COMMA types IDENTIFIER {
-    if(show_syntax) cout << "args mult" << endl;
-    $$ = $1; $$ -> addBrother(Node::make_list(2, $3, StringNode::Create($4)));
-  }
-  |
-  types IDENTIFIER {
-    if(show_syntax) cout << "args" << endl;
-    $$ = Node::make_list(2, $1, StringNode::Create($2));
-  };
-
-types:
-  DOUBLE {
-    if(show_syntax) cout << "types DOUBLE" << endl;
-    $$ = StringNode::Create("DOUBLE");
   };
 
 eols:

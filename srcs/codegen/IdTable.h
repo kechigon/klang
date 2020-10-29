@@ -8,8 +8,8 @@ class IDTable
 {
 public:
     IDTable();
-    id *find(std::string str) const;
-    void insert(std::string str, idType t, llvm::Value *d);
+    llvm::Value *find(std::string str) const;
+    void insert(std::string str, llvm::Value *d);
     void push();
     void pop();
     int getLevel();

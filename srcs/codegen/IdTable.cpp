@@ -5,22 +5,22 @@ IDTable::IDTable()
     ID_stack.push_back(IDMap());
 }
 
-id *IDTable::find(std::string idname) const
+llvm::Value *IDTable::find(std::string idname) const
 {
     for (auto p = ID_stack.rbegin(); p != ID_stack.rend(); ++p)
     {
         const IDMap &imap = *p;
-        id *pid = imap.find(idname);
+        llvm::Value *pid = imap.find(idname);
         if (pid != NULL)
             return pid;
     }
     return NULL;
 }
 
-void IDTable::insert(std::string str, idType t, llvm::Value *d)
+void IDTable::insert(std::string str, llvm::Value *d)
 {
     IDMap &imap = ID_stack.back();
-    imap.insert(str, t, d);
+    imap.insert(str, d);
 }
 
 void IDTable::push()
