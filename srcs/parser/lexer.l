@@ -47,7 +47,6 @@ LEFT_BRACE      \{
 RIGHT_BRACE     \}
 RIGHT_BRACKET   \]
 DOUBLE          double
-STRING          string
 VOID            void
 SEMICOLON       ;
 EOL             \n|\r\n
@@ -205,10 +204,6 @@ EOL             \n|\r\n
 
 {DOUBLE} {
   return DOUBLE;
-}
-
-{STRING} {
-  return STRING;
 }
 
 {VOID} {

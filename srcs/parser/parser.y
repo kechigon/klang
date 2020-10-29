@@ -57,7 +57,6 @@
        RIGHT_BRACE
        RIGHT_BRACKET
        DOUBLE
-       STRING
        VOID
        SEMICOLON
        EOL
@@ -225,13 +224,6 @@ element_content:
     $$ = Node::make_list(2, StringNode::Create("RETURN"), $2);
   }
   |
-  RETURN STRINGLITERAL {
-    if(show_syntax) cout << "element_content RETURN STRINGLITERAL" << endl;
-    string text = $2;
-    $$ = Node::make_list(2, StringNode::Create("RETURN"), StringNode::Create(text.substr(1, text.size()-2)));
-    ((StringNode*)($$->getNext()))->setIsLiteral();
-  }
-  |
   func_exe {
     if(show_syntax) cout << "element_content func_exe" << endl;
     $$ = $1;
@@ -328,19 +320,6 @@ identifiers:
   IDENTIFIER DOT IDENTIFIER {
     if(show_syntax) cout << "identifiers one array IDENTIFIER" << $1 << " " << $3 << endl;
     $$ = ArrayElementNode::Create($1, $3);
-  };
-
-subst_calc:
-  identifiers SUBST expression {
-    if(show_syntax) cout << "sbstcalc SUBST" << endl;
-    $$ = Node::make_list(3, StringNode::Create("SUBST"), $1, $3);
-  }
-  |
-  identifiers SUBST STRINGLITERAL {
-    if(show_syntax) cout << "subst_calc SUBST STRINGLITERAL" << endl;
-    string text = $3;
-    $$ = Node::make_list(3, StringNode::Create("SUBST"), $1, StringNode::Create(text.substr(1, text.size()-2)));
-    ((StringNode*)($$->getNext()->getNext()))->setIsLiteral();
   };
 
 subst_calc_2:
@@ -561,11 +540,6 @@ types:
   DOUBLE {
     if(show_syntax) cout << "types DOUBLE" << endl;
     $$ = StringNode::Create("DOUBLE");
-  }
-  |
-  STRING {
-    if(show_syntax) cout << "types STRING" << endl;
-    $$ = StringNode::Create("STRING");
   };
 
 eols:

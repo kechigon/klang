@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   if (argc == 3)
   {
     string option = argv[2];
-    if (option.length() > 4 || option.length() == 1)
+    if (option.length() > 4 || option.length() == 1 || option[0] != '-')
       printError("Invalid Options");
     for (int i = 1; i < ((int)option.length()); i++)
     {
