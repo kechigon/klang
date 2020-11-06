@@ -46,7 +46,7 @@ void CodeGen::Make()
 
   context->MakeBegin();
 
-  builder.SetInsertPoint(entrypoint);
+  builder.SetInsertPoint(context->getnowBlock());
   builder.CreateRet(builder.getInt32(0));
 
   if (llvm::verifyModule(*M))
@@ -56,8 +56,7 @@ void CodeGen::Make()
   }
   if (show_module)
   {
-    llvm::outs() << "-----LLVM module-----\n\n"
-                 << *M;
+    llvm::outs() << "-----LLVM module-----\n\n" << *M;
     llvm::outs().flush();
   }
 

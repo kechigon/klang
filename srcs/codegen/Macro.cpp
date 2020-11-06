@@ -3,6 +3,10 @@
 #include "nodes.h"
 
 void printError(std::string st);
+int if_then_index = 0;
+int if_marge_index = 0;
+int while_then_index = 0;
+int while_marge_index = 0;
 
 static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 {
@@ -49,14 +53,14 @@ static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 			node->check();
 			llvm::Value *lhs = EXR_macro(context, node->getNext());
 			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
-			return builder.CreateICmpEQ(lhs, rhs);
+			return builder.CreateFCmpOEQ(lhs, rhs);
 		}
 		else if (((StringNode *)node)->getStr() == "NOT_EQUAL")
 		{
 			node->check();
 			llvm::Value *lhs = EXR_macro(context, node->getNext());
 			llvm::Value *rhs = EXR_macro(context, node->getNext()->getNext());
-			return builder.CreateICmpNE(lhs, rhs);
+			return builder.CreateFCmpONE(lhs, rhs);
 		}
 		else if (((StringNode *)node)->getStr() == "MORE_EQUAL")
 		{
@@ -122,8 +126,7 @@ static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 		else if (context->FindST(node) != NULL)
 		{
 			node->check();
-			llvm::Value *v = builder.CreateLoad(context->FindST(node));
-			return v;
+			return builder.CreateLoad(context->FindST(node));
 		}
 		else
 		{
@@ -135,7 +138,7 @@ static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 	else if (node->isDoubleNode())
 	{
 		node->check();
-		return llvm::ConstantFP::get(llvm::Type::getDoubleTy(*(context->getContext())), ((DoubleNode *)node)->getdouble());
+		return llvm::ConstantFP::get(*(context->getContext()), llvm::APFloat(((DoubleNode *)node)->getdouble()));
 	}
 	return NULL;
 }
@@ -180,6 +183,16 @@ static llvm::Value *SUBST_macro(CodeGenContext *context, Node *node)
 		printError("The variable is not declared(" + idname + ")");
 		return NULL;
 	}
+}
+
+static llvm::Value *DECL_SUBST_macro(CodeGenContext *context, Node *node)
+{
+	node->check();
+	node = node->getChild();
+	node->check();
+	node = node->getNext();
+	DECL_macro(context, node);
+	return SUBST_macro(context, node);
 }
 
 static llvm::Value *ADD_SUBST_macro(CodeGenContext *context, Node *node)
@@ -327,6 +340,93 @@ static llvm::Value *INPUT_macro(CodeGenContext *context, Node *node)
 	}
 }
 
+llvm::Value *condition_calc(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *condition = EXR_macro(context, node);
+	if (condition->getType()->isDoubleTy())
+	{
+		if (condition == llvm::ConstantFP::get(*(context->getContext()), llvm::APFloat(double(0.0))))
+			condition = builder.getInt1(false);
+		else
+			condition = builder.getInt1(true);
+	}
+
+	return condition;
+}
+
+static llvm::Value *IF_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *condition = condition_calc(context, node);
+
+	llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("if_then") + std::to_string(if_then_index++), context->getnowFunc());
+	llvm::BasicBlock *margeBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("if_marge") + std::to_string(if_marge_index++));
+
+	builder.CreateCondBr(condition, thenBB, margeBB);
+
+	builder.SetInsertPoint(thenBB);
+	context->setnowBlock(thenBB);
+	context->st->push();
+	context->MakeMacro(node->getNext());
+	builder.SetInsertPoint(context->getnowBlock());
+	builder.CreateBr(margeBB);
+	context->st->pop();
+	
+	context->getnowFunc()->getBasicBlockList().push_back(margeBB);
+	builder.SetInsertPoint(margeBB);
+	context->setnowBlock(margeBB);
+
+	return NULL;
+}
+
+static llvm::Value *WHILE_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *condition = condition_calc(context, node);
+
+	llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("while_then") + std::to_string(while_then_index++), context->getnowFunc());
+	llvm::BasicBlock *margeBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("while_marge") + std::to_string(while_marge_index++));
+
+	builder.CreateCondBr(condition, thenBB, margeBB);
+
+	builder.SetInsertPoint(thenBB);
+	context->setnowBlock(thenBB);
+	context->st->push();
+	context->MakeMacro(node->getNext());
+	builder.SetInsertPoint(context->getnowBlock());
+	condition = condition_calc(context, node);
+	builder.CreateCondBr(condition, thenBB, margeBB);
+	context->st->pop();
+
+	context->getnowFunc()->getBasicBlockList().push_back(margeBB);
+	builder.SetInsertPoint(margeBB);
+	context->setnowBlock(margeBB);
+
+	return NULL;
+}
+
+/*static llvm::Value *IF_END_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	context->popBB();
+	if (!context->BBst_is_empty())
+	{
+		builder.CreateBr(context->BBst_top());
+		context->setnowBlock(context->BBst_top());
+		builder.SetInsertPoint(context->BBst_top());
+	}
+	return NULL;
+}*/
+
 /*static llvm::Value* FUNC_macro(CodeGenContext* context, Node* node) {
 
 	node = node->getNext();
@@ -374,6 +474,7 @@ static llvm::Value *INPUT_macro(CodeGenContext *context, Node *node)
 
 extern const FuncReg macro_funcs[] = {
 		{"DECL", DECL_macro},
+		{"DECL_SUBST", DECL_SUBST_macro},
 		{"SUBST", SUBST_macro},
 		{"ADD_SUBST", ADD_SUBST_macro},
 		{"SUBT_SUBST", SUBT_SUBST_macro},
@@ -382,4 +483,7 @@ extern const FuncReg macro_funcs[] = {
 		{"OUTPUT", OUTPUT_macro},
 		{"NEWLINE", NEWLINE_macro},
 		{"INPUT", INPUT_macro},
+		{"IF", IF_macro},
+		//{"IF_END", IF_END_macro},
+		{"WHILE", WHILE_macro},
 		{NULL, NULL}};

@@ -152,7 +152,7 @@ func_block:
 elements:
   elements element {
     if(show_syntax) cout << "elements repeat" << endl;
-    $$ = $1; $$ -> addBrother($2);
+    $$ = $1; $$ -> addBrother(Node::getList($2));
   }
   |
   element {
@@ -452,6 +452,8 @@ monomial:
 if_stmt:
   IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
     if(show_syntax) cout << "if_stmt" << endl;
+    //Node *node = Node::make_list(2, $8, StringNode::Create("IF_END"));
+    //$$ = Node::make_list(3, StringNode::Create("IF"), $3, node);
     $$ = Node::make_list(3, StringNode::Create("IF"), $3, $8);
   }
   |
@@ -481,7 +483,7 @@ else_if_stmts:
     $$ = Node::getList($1);
   };
 
-  else_if_stmt:
+else_if_stmt:
   ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements {
     if(show_syntax) cout << "else_if_stmt" << endl;
     $$ = Node::make_list(3, StringNode::Create("ELSE_IF"), $4, $9);

@@ -1,24 +1,28 @@
-void print(int a)
+double i = 1
+while(i <= 100)
 {
-  $a
-}
-
-for(int i = 1, i <=100, i += 1)
-{
-  if(i % 15 == 0)
+  if(i - (i / 15 * 15) == 0)
   {
     $"FizzBuzz"
+    ;
+    i += 1
+    continue
   }
-  else if(i % 3 == 0)
+  if(i - (i / 3 * 3) == 0)
   {
     $"Fizz"
+    ;
+    i += 1
+    continue
   }
-  else if(i % 5 == 0)
+  if(i - (i / 5 * 5) == 0)
   {
     $"Buzz"
+    ;
+    i += 1
+    continue
   }
-  else
-  {
-    $i
-  ]
+  $i
+  ;
+  i += 1
 }
