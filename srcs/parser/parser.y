@@ -55,7 +55,6 @@
        RIGHT_PAREN
        LEFT_BRACE
        RIGHT_BRACE
-       RIGHT_BRACKET
        DOUBLE
        VOID
        SEMICOLON
@@ -78,8 +77,6 @@
 %type <nodes> expression
 %type <nodes> monomial
 %type <nodes> if_stmt
-%type <nodes> else_if_stmts
-%type <nodes> else_if_stmt
 %type <nodes> for_stmt
 %type <nodes> func_exe
 %right SUBST ADD_SUBST SUBT_SUBST MULT_SUBST DIV_SUBST
@@ -450,43 +447,16 @@ monomial:
   };
 
 if_stmt:
-  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     if(show_syntax) cout << "if_stmt" << endl;
     //Node *node = Node::make_list(2, $8, StringNode::Create("IF_END"));
     //$$ = Node::make_list(3, StringNode::Create("IF"), $3, node);
     $$ = Node::make_list(3, StringNode::Create("IF"), $3, $8);
   }
   |
-  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
+  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     if(show_syntax) cout << "if_stmt else" << endl;
-    $$ = Node::make_list(5, StringNode::Create("IF"), $3, $8, StringNode::Create("ELSE"), $15);
-  }
-  |
-  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACKET{
-    if(show_syntax) cout << "if_stmt elseif_stmts_end" << endl;
-    $$ = Node::make_list(4, StringNode::Create("IF"), $3, $8, $11);
-  }
-  |
-  IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE EOL else_if_stmts RIGHT_BRACE EOL ELSE EOL LEFT_BRACE EOL elements RIGHT_BRACKET {
-    if(show_syntax) cout << "if_stmt else_if_stmts_mid else" << endl;
-    $$ = Node::make_list(6, StringNode::Create("IF"), $3, $8, $11, StringNode::Create("ELSE"), $18);
-  };
-
-else_if_stmts:
-  else_if_stmts RIGHT_BRACE EOL else_if_stmt {
-    if(show_syntax) cout << "else_if_stmts mult" << endl;
-    $$ = $1; $$ -> addBrother(Node::getList($4));
-  }
-  |
-  else_if_stmt {
-    if(show_syntax) cout << "else_if_stmts" << endl;
-    $$ = Node::getList($1);
-  };
-
-else_if_stmt:
-  ELSE IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements {
-    if(show_syntax) cout << "else_if_stmt" << endl;
-    $$ = Node::make_list(3, StringNode::Create("ELSE_IF"), $4, $9);
+    $$ = Node::make_list(4, StringNode::Create("IF_ELSE"), $3, $8, $14);
   };
 
 for_stmt:

@@ -12,16 +12,16 @@ while(flag == 0)
   {
     $"Bigger than " $num
     ;
-  ]
+  }
   if(num > ans)
   {
     $"Smaller than " $num
     ;
-  ]
+  }
   if(num == ans)
   {
     flag = 1
-  ]
+  }
 }
 ;
 $"Correct!"

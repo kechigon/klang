@@ -4,6 +4,7 @@
 
 void printError(std::string st);
 int if_then_index = 0;
+int if_else_index = 0;
 int if_marge_index = 0;
 int while_then_index = 0;
 int while_marge_index = 0;
@@ -386,6 +387,47 @@ static llvm::Value *IF_macro(CodeGenContext *context, Node *node)
 	return NULL;
 }
 
+static llvm::Value *IF_ELSE_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	llvm::Value *condition = condition_calc(context, node);
+
+	llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("if_then") + std::to_string(if_then_index++), context->getnowFunc());
+	llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("if_else") + std::to_string(if_else_index++));
+	llvm::BasicBlock *margeBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("if_marge") + std::to_string(if_marge_index++));
+
+	builder.CreateCondBr(condition, thenBB, elseBB);
+
+	builder.SetInsertPoint(thenBB);
+	context->setnowBlock(thenBB);
+	context->st->push();
+	node = node->getNext();
+	node->check();
+	context->MakeMacro(node->getChild());
+	builder.SetInsertPoint(context->getnowBlock());
+	builder.CreateBr(margeBB);
+	context->st->pop();
+	
+	context->getnowFunc()->getBasicBlockList().push_back(elseBB);
+	builder.SetInsertPoint(elseBB);
+	context->setnowBlock(elseBB);
+	context->st->push();
+	node = node->getNext();
+	node->check();
+	context->MakeMacro(node->getChild());
+	builder.SetInsertPoint(context->getnowBlock());
+	builder.CreateBr(margeBB);
+	context->st->pop();
+
+	context->getnowFunc()->getBasicBlockList().push_back(margeBB);
+	builder.SetInsertPoint(margeBB);
+	context->setnowBlock(margeBB);
+
+	return NULL;
+}
+
 static llvm::Value *WHILE_macro(CodeGenContext *context, Node *node)
 {
 	llvm::IRBuilder<> builder = *(context->getBuilder());
@@ -524,6 +566,7 @@ extern const FuncReg macro_funcs[] = {
 		{"NEWLINE", NEWLINE_macro},
 		{"INPUT", INPUT_macro},
 		{"IF", IF_macro},
+		{"IF_ELSE", IF_ELSE_macro},
 		//{"IF_END", IF_END_macro},
 		{"WHILE", WHILE_macro},
 		{"FOR", FOR_macro},

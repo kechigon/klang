@@ -45,7 +45,6 @@ LEFT_PAREN      \(
 RIGHT_PAREN     \)
 LEFT_BRACE      \{
 RIGHT_BRACE     \}
-RIGHT_BRACKET   \]
 DOUBLE          double
 VOID            void
 SEMICOLON       ;
@@ -197,10 +196,6 @@ EOL             \n|\r\n
 }
 
 {COMMENT} ;
-
-{RIGHT_BRACKET} {
-  return RIGHT_BRACKET;
-}
 
 {DOUBLE} {
   return DOUBLE;
