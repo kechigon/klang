@@ -1,0 +1,28 @@
+double ans = 42
+double flag = 0
+while(flag == 0)
+{
+  double num
+  ;
+  $"Enter a value"
+  ;
+  $"Number:"
+  #num
+  if(num < ans)
+  {
+    $"Bigger than " $num
+    ;
+  ]
+  if(num > ans)
+  {
+    $"Smaller than " $num
+    ;
+  ]
+  if(num == ans)
+  {
+    flag = 1
+  ]
+}
+;
+$"Correct!"
+;

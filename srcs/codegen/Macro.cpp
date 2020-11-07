@@ -7,6 +7,8 @@ int if_then_index = 0;
 int if_marge_index = 0;
 int while_then_index = 0;
 int while_marge_index = 0;
+int for_then_index = 0;
+int for_marge_index = 0;
 
 static llvm::Value *EXR_macro(CodeGenContext *context, Node *node)
 {
@@ -412,6 +414,44 @@ static llvm::Value *WHILE_macro(CodeGenContext *context, Node *node)
 	return NULL;
 }
 
+static llvm::Value *FOR_macro(CodeGenContext *context, Node *node)
+{
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
+	node->check();
+	context->MakeMacro(node->getChild());
+
+	node = node->getNext();
+	Node *exrNode = node;
+	llvm::Value *condition = condition_calc(context, node);
+
+	llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("for_then") + std::to_string(for_then_index++), context->getnowFunc());
+	llvm::BasicBlock *margeBB = llvm::BasicBlock::Create(*(context->getContext()), std::string("for_marge") + std::to_string(for_marge_index++));
+
+	builder.CreateCondBr(condition, thenBB, margeBB);
+
+	builder.SetInsertPoint(thenBB);
+	context->setnowBlock(thenBB);
+	context->st->push();
+	node = node->getNext();
+	context->MakeMacro(node);
+
+	builder.SetInsertPoint(context->getnowBlock());
+	node = node->getNext();
+	node->check();
+	context->MakeMacro(node);
+	condition = condition_calc(context, exrNode);
+	builder.CreateCondBr(condition, thenBB, margeBB);
+	context->st->pop();
+
+	context->getnowFunc()->getBasicBlockList().push_back(margeBB);
+	builder.SetInsertPoint(margeBB);
+	context->setnowBlock(margeBB);
+
+	return NULL;
+}
+
 /*static llvm::Value *IF_END_macro(CodeGenContext *context, Node *node)
 {
 	llvm::IRBuilder<> builder = *(context->getBuilder());
@@ -486,4 +526,5 @@ extern const FuncReg macro_funcs[] = {
 		{"IF", IF_macro},
 		//{"IF_END", IF_END_macro},
 		{"WHILE", WHILE_macro},
+		{"FOR", FOR_macro},
 		{NULL, NULL}};
