@@ -90,9 +90,7 @@ Node *Node::make_list(int num, ...)
 
 Node *Node::getList(Node *node)
 {
-    if (!node->isSingle())
-        return new Node(node);
-    return node;
+    return new Node(node);
 }
 
 bool Node::isNode()

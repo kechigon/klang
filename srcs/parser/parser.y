@@ -49,8 +49,6 @@
        ELSE
        FOR
        WHILE
-       BREAK
-       CONTINUE
        LEFT_PAREN
        RIGHT_PAREN
        LEFT_BRACE
@@ -202,16 +200,6 @@ element_content:
   for_stmt {
     if(show_syntax) cout << "element_content for_stmt" << endl;
     $$ = $1;
-  }
-  |
-  BREAK {
-    if(show_syntax) cout << "element_content BREAK" << endl;
-    $$ = StringNode::Create("BREAK");
-  }
-  |
-  CONTINUE {
-    if(show_syntax) cout << "element_content CONTINUE" << endl;
-    $$ = StringNode::Create("CONTINUE");
   }
   |
   RETURN expression {
@@ -449,8 +437,6 @@ monomial:
 if_stmt:
   IF LEFT_PAREN expression RIGHT_PAREN EOL LEFT_BRACE EOL elements RIGHT_BRACE {
     if(show_syntax) cout << "if_stmt" << endl;
-    //Node *node = Node::make_list(2, $8, StringNode::Create("IF_END"));
-    //$$ = Node::make_list(3, StringNode::Create("IF"), $3, node);
     $$ = Node::make_list(3, StringNode::Create("IF"), $3, $8);
   }
   |

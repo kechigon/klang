@@ -75,10 +75,6 @@ public:
 	void AddFunc(std::string name, llvm::Function *func);
 	llvm::Function *FindFunc(std::string name) const;
 
-	void pushBB(llvm::BasicBlock *BB) { BB_stack.push(BB); };
-	void popBB() { BB_stack.pop(); };
-	bool BBst_is_empty() { return BB_stack.empty(); };
-	llvm::BasicBlock *BBst_top() { return BB_stack.top(); };
 private:
 	Node *root;
 
@@ -91,8 +87,6 @@ private:
 	std::map<std::string, CodeGenFunction> macro_map;
 
 	std::map<std::string, llvm::Function *> func_map;
-
-	std::stack<llvm::BasicBlock *> BB_stack;
 };
 
 #endif

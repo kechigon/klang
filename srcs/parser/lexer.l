@@ -39,8 +39,6 @@ IF              if
 ELSE            else
 FOR             for
 WHILE           while
-BREAK           break
-CONTINUE        continue
 LEFT_PAREN      \(
 RIGHT_PAREN     \)
 LEFT_BRACE      \{
@@ -169,14 +167,6 @@ EOL             \n|\r\n
 
 {WHILE} {
   return WHILE;
-}
-
-{BREAK} {
-  return BREAK;
-}
-
-{CONTINUE} {
-  return CONTINUE;
 }
 
 {LEFT_PAREN} {
