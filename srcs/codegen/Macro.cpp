@@ -153,19 +153,29 @@ static llvm::Value *DECL_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	if (context->FindST(node) == NULL)
+	if (node->isNode())
 	{
 		node->check();
-		llvm::AllocaInst *alloc = builder.CreateAlloca(llvm::Type::getDoubleTy(*(context->getContext())), nullptr);
-		context->st->insert(((StringNode *)node)->getStr(), (llvm::Value *)alloc);
-		return alloc;
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL)
 	{
-		std::string idname = ((StringNode *)(node->getNext()))->getStr().c_str();
-		printError("redefinition error(" + idname + ")");
-		return NULL;
+		if (context->FindST(node) == NULL)
+		{
+			node->check();
+			llvm::AllocaInst *alloc = builder.CreateAlloca(llvm::Type::getDoubleTy(*(context->getContext())), nullptr);
+			context->st->insert(((StringNode *)node)->getStr(), (llvm::Value *)alloc);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)(node->getNext()))->getStr().c_str();
+			printError("redefinition error(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *SUBST_macro(CodeGenContext *context, Node *node)
@@ -173,31 +183,73 @@ static llvm::Value *SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	llvm::Value *con = EXR_macro(context, node->getNext());
+	if (!con->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
 	{
 		node->check();
-		llvm::Value *con = EXR_macro(context, node->getNext());
-		if (!con->getType()->isDoubleTy())
-			printError("Boolean value cannot be assigned to double");
-		return builder.CreateStore(con, id);
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL && !node->ischecked())
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			builder.CreateStore(con, id);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *DECL_SUBST_macro(CodeGenContext *context, Node *node)
 {
+	llvm::IRBuilder<> builder = *(context->getBuilder());
+	builder.SetInsertPoint(context->getnowBlock());
+
 	node->check();
 	node = node->getChild();
 	node->check();
 	node = node->getNext();
-	DECL_macro(context, node);
-	return SUBST_macro(context, node);
+
+	llvm::Value *con = EXR_macro(context, node->getNext());
+	if (!con->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
+	{
+		node->check();
+		node = node->getChild();
+	}
+
+	while (node != NULL && !node->ischecked())
+	{
+		if (context->FindST(node) == NULL)
+		{
+			node->check();
+			llvm::AllocaInst *alloc = builder.CreateAlloca(llvm::Type::getDoubleTy(*(context->getContext())), nullptr);
+			context->st->insert(((StringNode *)node)->getStr(), (llvm::Value *)alloc);
+			builder.CreateStore(con, alloc);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)(node->getNext()))->getStr().c_str();
+			printError("redefinition error(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
+	}
+	return NULL;
 }
 
 static llvm::Value *ADD_SUBST_macro(CodeGenContext *context, Node *node)
@@ -205,23 +257,35 @@ static llvm::Value *ADD_SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	llvm::Value *exr = EXR_macro(context, node->getNext());
+	if (!exr->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
 	{
 		node->check();
-		llvm::Value *exr = EXR_macro(context, node->getNext());
-		if (!exr->getType()->isDoubleTy())
-			printError("Boolean value cannot be assigned to double");
-		llvm::Value *data = builder.CreateLoad(id);
-		llvm::Value *add = builder.CreateFAdd(data, exr);
-		return builder.CreateStore(add, id);
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL && !node->ischecked())
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			llvm::Value *data = builder.CreateLoad(id);
+			llvm::Value *add = builder.CreateFAdd(data, exr);
+			builder.CreateStore(add, id);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *SUBT_SUBST_macro(CodeGenContext *context, Node *node)
@@ -229,23 +293,35 @@ static llvm::Value *SUBT_SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	llvm::Value *exr = EXR_macro(context, node->getNext());
+	if (!exr->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
 	{
 		node->check();
-		llvm::Value *exr = EXR_macro(context, node->getNext());
-		if (!exr->getType()->isDoubleTy())
-			printError("Boolean value cannot be assigned to double");
-		llvm::Value *data = builder.CreateLoad(id);
-		llvm::Value *add = builder.CreateFSub(data, exr);
-		return builder.CreateStore(add, id);
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL && !node->ischecked())
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			llvm::Value *data = builder.CreateLoad(id);
+			llvm::Value *sub = builder.CreateFSub(data, exr);
+			builder.CreateStore(sub, id);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *MULT_SUBST_macro(CodeGenContext *context, Node *node)
@@ -253,23 +329,35 @@ static llvm::Value *MULT_SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	llvm::Value *exr = EXR_macro(context, node->getNext());
+	if (!exr->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
 	{
 		node->check();
-		llvm::Value *exr = EXR_macro(context, node->getNext());
-		if (!exr->getType()->isDoubleTy())
-			printError("Boolean value cannot be assigned to double");
-		llvm::Value *data = builder.CreateLoad(id);
-		llvm::Value *add = builder.CreateFMul(data, exr);
-		return builder.CreateStore(add, id);
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL && !node->ischecked())
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			llvm::Value *data = builder.CreateLoad(id);
+			llvm::Value *mul = builder.CreateFMul(data, exr);
+			builder.CreateStore(mul, id);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *DIV_SUBST_macro(CodeGenContext *context, Node *node)
@@ -277,23 +365,35 @@ static llvm::Value *DIV_SUBST_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	llvm::Value *exr = EXR_macro(context, node->getNext());
+	if (!exr->getType()->isDoubleTy())
+		printError("Boolean value cannot be assigned to double");
+
+	if (node->isNode())
 	{
 		node->check();
-		llvm::Value *exr = EXR_macro(context, node->getNext());
-		if (!exr->getType()->isDoubleTy())
-			printError("Boolean value cannot be assigned to double");
-		llvm::Value *data = builder.CreateLoad(id);
-		llvm::Value *add = builder.CreateFDiv(data, exr);
-		return builder.CreateStore(add, id);
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL && !node->ischecked())
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			llvm::Value *data = builder.CreateLoad(id);
+			llvm::Value *div = builder.CreateFDiv(data, exr);
+			builder.CreateStore(div, id);
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 static llvm::Value *OUTPUT_macro(CodeGenContext *context, Node *node)
@@ -331,18 +431,29 @@ static llvm::Value *INPUT_macro(CodeGenContext *context, Node *node)
 	llvm::IRBuilder<> builder = *(context->getBuilder());
 	builder.SetInsertPoint(context->getnowBlock());
 
-	llvm::Value *id = context->FindST(node);
-	if (id != NULL)
+	if (node->isNode())
 	{
 		node->check();
-		return builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id));
+		node = node->getChild();
 	}
-	else
+
+	while (node != NULL)
 	{
-		std::string idname = ((StringNode *)node)->getStr().c_str();
-		printError("The variable is not declared(" + idname + ")");
-		return NULL;
+		llvm::Value *id = context->FindST(node);
+		if (id != NULL)
+		{
+			node->check();
+			builder.CreateCall(context->FindFunc("scanDouble"), std::vector<llvm::Value *>(1, id));
+		}
+		else
+		{
+			std::string idname = ((StringNode *)node)->getStr().c_str();
+			printError("The variable is not declared(" + idname + ")");
+			return NULL;
+		}
+		node = node->getNext();
 	}
+	return NULL;
 }
 
 llvm::Value *condition_calc(CodeGenContext *context, Node *node)

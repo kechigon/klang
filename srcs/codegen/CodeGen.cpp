@@ -49,11 +49,11 @@ void CodeGen::Make()
   builder.SetInsertPoint(context->getnowBlock());
   builder.CreateRet(builder.getInt32(0));
 
-  /*if (llvm::verifyModule(*M))
+  if (llvm::verifyModule(*M))
   {
     std::cout << "LLVM bytecode error!\n";
     exit(1);
-  }*/
+  }
   if (show_module)
   {
     llvm::outs() << "-----LLVM module-----\n\n" << *M;
