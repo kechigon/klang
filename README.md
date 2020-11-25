@@ -31,7 +31,7 @@ llvmIRを表示 `-l`<br>
 ### それぞれのファイルについて
 `printDouble.ll` double型の出力機能<br>
 
-`printString.ll` 文字列の出力機能<br>
+`printStr.ll` 文字列の出力機能<br>
 
 `printNewLine.ll` 改行出力機能<br>
 
