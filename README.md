@@ -8,7 +8,7 @@ WSL1 Ubuntu 18.04.5 LTS (Bionic Beaver)
 
 今の段階ではklangの実行、リンクにllvmのツールを使用しています<br>
 
-`sudo apt install llvm-6.0`
+`sudo apt install llvm-6.0*`
 # 実行方法
 ## コンパイル
 テキストファイルからllvmIRにコンパイルし、out.llとして出力します。<br>
@@ -26,12 +26,12 @@ llvmIRを表示 `-l`<br>
 ## リンク
 入出力の機能は`build-in-function`ディレクトリ内のファイルとリンクすると実行可能になります。<br>
 
-`llvm-linke out.ll bin/build-in-function/hoge.ll -S -o hoge.ll`
+`llvm-link out.ll bin/build-in-function/hoge.ll -S -o hoge.ll`
 
 ### それぞれのファイルについて
 `printDouble.ll` double型の出力機能<br>
 
-`prrintString.ll` 文字列の出力機能<br>
+`printString.ll` 文字列の出力機能<br>
 
 `printNewLine.ll` 改行出力機能<br>
 
