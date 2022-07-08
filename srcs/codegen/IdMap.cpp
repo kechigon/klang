@@ -1,4 +1,4 @@
-#include "idmap.h"
+#include "IdMap.h"
 
 IDMap::IDMap()
 {

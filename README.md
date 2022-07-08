@@ -6,9 +6,11 @@ WSL1 Ubuntu 18.04.5 LTS (Bionic Beaver)
 # 入手方法
 `git clone https://github.com/kechigon/klang.git`<br>
 
-今の段階ではklangの実行、リンクにllvmのツールを使用しています<br>
+klangのビルド、klangのコードを実行するためのパッケージをインストールしてください<br>
 
-`sudo apt install llvm`
+`sudo apt install llvm bison flex`
+# ビルド
+`/build`で`make`を実行してください`/bin`配下にklangが生成されます
 # 実行方法
 ## コンパイル
 テキストファイルからllvmIRにコンパイルし、out.llとして出力します。<br>
