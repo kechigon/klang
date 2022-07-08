@@ -8,7 +8,7 @@ WSL1 Ubuntu 18.04.5 LTS (Bionic Beaver)
 
 今の段階ではklangの実行、リンクにllvmのツールを使用しています<br>
 
-`sudo apt install llvm-6.0*`
+`sudo apt install llvm`
 # 実行方法
 ## コンパイル
 テキストファイルからllvmIRにコンパイルし、out.llとして出力します。<br>
