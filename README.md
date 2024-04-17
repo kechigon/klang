@@ -1,14 +1,13 @@
 # 概要
 テキストファイルを独自の構文でllvmIRに静的コンパイルします。<br>
 構文の特徴としては、入出力の関数を一文字で呼び出せる、改行で命令を区切るなどがあります。
-# 動作確認済み環境
-WSL1 Ubuntu 18.04.5 LTS (Bionic Beaver)
+
 # 入手方法
 `git clone https://github.com/kechigon/klang.git`<br>
 
 klangのビルド、klangのコードを実行するためのパッケージをインストールしてください<br>
 
-`sudo apt install llvm bison flex`
+`sudo apt install llvm-6.0 bison flex`
 # ビルド
 `/build`で`make`を実行してください`/bin`配下にklangが生成されます
 # 実行方法
