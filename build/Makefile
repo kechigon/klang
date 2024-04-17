@@ -2,8 +2,7 @@ CFLAG = -I /usr/include/llvm-6.0 -I /usr/include/llvm-c-6.0 -I ../srcs/ast -I ..
 NODES = ../srcs/ast/Node.cpp ../srcs/ast/StringNode.cpp ../srcs/ast/DoubleNode.cpp ../srcs/ast/ArrayElementNode.cpp
 
 klang: lex.yy.c parser.tab.c parser.tab.h main.o Node.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o
-	g++ main.o Node.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o parser.tab.c lex.yy.c ${CFLAG} -o klang
-	cp klang ../bin
+	g++ main.o Node.o StringNode.o DoubleNode.o ArrayElementNode.o showAST.o CodeGenContext.o IdMap.o IdTable.o CodeGen.o Macro.o error.o parser.tab.c lex.yy.c ${CFLAG} -o ../bin/klang
 
 main.o: ../srcs/main.cpp
 	g++ -c ${CFLAG} ../srcs/main.cpp
@@ -39,7 +38,7 @@ error.o: ../srcs/error.cpp
 	g++ -c ${CFLAG} ../srcs/error.cpp
 
 clean:
-	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o *.ll  *.out a.txt klang
+	rm lex.yy.c parser.tab.c parser.tab.h parser.output *.o *.ll  *.out a.txt
 
 re: clean klang
 
